@@ -72,7 +72,7 @@ class SagaCommandHandlerTest {
             "corr-456", "INVOICE"
         );
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.empty());
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.empty());
         when(documentRepository.save(any(SignedPdfDocument.class))).thenAnswer(invocation -> {
             SignedPdfDocument doc = invocation.getArgument(0);
             // Simulate ID assignment by repository
@@ -148,7 +148,7 @@ class SagaCommandHandlerTest {
             java.time.Instant.now()
         );
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.of(completedDocument));
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.of(completedDocument));
 
         // When
         sagaCommandHandler.handleProcessCommand(command);
@@ -196,7 +196,7 @@ class SagaCommandHandlerTest {
             java.time.Instant.now()
         );
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.of(document));
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.of(document));
         doNothing().when(domainPdfSigningService).compensateSigning(any(SignedPdfDocumentId.class), anyString());
 
         // When
@@ -220,7 +220,7 @@ class SagaCommandHandlerTest {
             "doc-789", "INVOICE", "sign-pdf"
         );
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.empty());
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.empty());
 
         // When
         sagaCommandHandler.handleCompensation(command);
@@ -260,7 +260,7 @@ class SagaCommandHandlerTest {
             java.time.Instant.now()
         );
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.of(completedDocument));
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.of(completedDocument));
 
         // When - call via interface method
         sagaCommandHandler.handleProcessPdfSigning(command);
@@ -291,7 +291,7 @@ class SagaCommandHandlerTest {
             "doc-789", "INVOICE", "sign-pdf"
         );
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.empty());
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.empty());
 
         // When - call via interface method
         sagaCommandHandler.handleCompensatePdfSigning(command);
@@ -327,7 +327,7 @@ class SagaCommandHandlerTest {
         failedDocument.incrementRetryCount();
         failedDocument.incrementRetryCount();
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.of(failedDocument));
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.of(failedDocument));
 
         // When
         sagaCommandHandler.handleProcessCommand(command);
@@ -363,7 +363,7 @@ class SagaCommandHandlerTest {
             "corr-456", "INVOICE"
         );
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.empty());
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.empty());
         when(documentRepository.save(any(SignedPdfDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(domainPdfSigningService.signPdf(any(), any(), any()))
             .thenThrow(new RuntimeException("Signing failed"));
@@ -410,7 +410,7 @@ class SagaCommandHandlerTest {
             java.time.Instant.now()
         );
 
-        when(documentRepository.findByInvoiceId("doc-789")).thenReturn(Optional.of(document));
+        when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.of(document));
         doThrow(new RuntimeException("Compensation failed"))
             .when(domainPdfSigningService).compensateSigning(any(SignedPdfDocumentId.class), anyString());
 

@@ -24,11 +24,11 @@ public class PdfSignedNotificationEvent extends TraceEvent {
     private static final String TRACE_TYPE = "PdfSigned";
     private static final String SOURCE = "pdf-signing-service";
 
-    @JsonProperty("invoiceId")
-    private final String invoiceId;
+    @JsonProperty("documentId")
+    private final String documentId;
 
-    @JsonProperty("invoiceNumber")
-    private final String invoiceNumber;
+    @JsonProperty("documentNumber")
+    private final String documentNumber;
 
     @JsonProperty("documentType")
     private final String documentType;
@@ -53,8 +53,8 @@ public class PdfSignedNotificationEvent extends TraceEvent {
      */
     public static PdfSignedNotificationEvent create(
             String sagaId,
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String documentType,
             String signedDocumentId,
             String signedPdfUrl,
@@ -64,7 +64,7 @@ public class PdfSignedNotificationEvent extends TraceEvent {
             String correlationId) {
 
         return new PdfSignedNotificationEvent(
-            sagaId, invoiceId, invoiceNumber, documentType,
+            sagaId, documentId, documentNumber, documentType,
             signedDocumentId, signedPdfUrl, signedPdfSize,
             signatureLevel, signatureTimestamp, correlationId
         );
@@ -75,8 +75,8 @@ public class PdfSignedNotificationEvent extends TraceEvent {
      */
     private PdfSignedNotificationEvent(
             String sagaId,
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String documentType,
             String signedDocumentId,
             String signedPdfUrl,
@@ -86,8 +86,8 @@ public class PdfSignedNotificationEvent extends TraceEvent {
             String correlationId) {
 
         super(sagaId, correlationId, SOURCE, TRACE_TYPE, null);
-        this.invoiceId = invoiceId;
-        this.invoiceNumber = invoiceNumber;
+        this.documentId = documentId;
+        this.documentNumber = documentNumber;
         this.documentType = documentType;
         this.signedDocumentId = signedDocumentId;
         this.signedPdfUrl = signedPdfUrl;
@@ -111,8 +111,8 @@ public class PdfSignedNotificationEvent extends TraceEvent {
         @JsonProperty("source") String source,
         @JsonProperty("traceType") String traceType,
         @JsonProperty("context") String context,
-        @JsonProperty("invoiceId") String invoiceId,
-        @JsonProperty("invoiceNumber") String invoiceNumber,
+        @JsonProperty("documentId") String documentId,
+        @JsonProperty("documentNumber") String documentNumber,
         @JsonProperty("documentType") String documentType,
         @JsonProperty("signedDocumentId") String signedDocumentId,
         @JsonProperty("signedPdfUrl") String signedPdfUrl,
@@ -121,8 +121,8 @@ public class PdfSignedNotificationEvent extends TraceEvent {
         @JsonProperty("signatureTimestamp") Instant signatureTimestamp
     ) {
         super(eventId, occurredAt, eventType, version, sagaId, correlationId, source, traceType, context);
-        this.invoiceId = invoiceId;
-        this.invoiceNumber = invoiceNumber;
+        this.documentId = documentId;
+        this.documentNumber = documentNumber;
         this.documentType = documentType;
         this.signedDocumentId = signedDocumentId;
         this.signedPdfUrl = signedPdfUrl;

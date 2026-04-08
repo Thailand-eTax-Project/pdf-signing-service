@@ -93,7 +93,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             pdfSignedEventPort.publishPdfSigningFailureNotification(
                 command.getSagaId(),
                 command.getDocumentId(),
-                command.getInvoiceNumber(),
+                command.getDocumentNumber(),
                 command.getDocumentType(),
                 "Maximum retry attempts exceeded for PDF signing",
                 command.getCorrelationId()
@@ -107,7 +107,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             SignedPdfDocument document = existing.orElseGet(() ->
                 SignedPdfDocument.create(
                     command.getDocumentId(),
-                    command.getInvoiceNumber(),
+                    command.getDocumentNumber(),
                     command.getPdfUrl(),
                     command.getPdfSize(),
                     command.getCorrelationId(),
@@ -154,7 +154,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             pdfSignedEventPort.publishPdfSignedNotification(
                 command.getSagaId(),
                 command.getDocumentId(),
-                command.getInvoiceNumber(),
+                command.getDocumentNumber(),
                 command.getDocumentType(),
                 document.getId().toString(),
                 result.signedPdfUrl(),
@@ -189,7 +189,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             pdfSignedEventPort.publishPdfSigningFailureNotification(
                 command.getSagaId(),
                 command.getDocumentId(),
-                command.getInvoiceNumber(),
+                command.getDocumentNumber(),
                 command.getDocumentType(),
                 e.getMessage(),
                 command.getCorrelationId()
@@ -216,7 +216,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             pdfSignedEventPort.publishPdfSigningFailureNotification(
                 command.getSagaId(),
                 command.getDocumentId(),
-                command.getInvoiceNumber(),
+                command.getDocumentNumber(),
                 command.getDocumentType(),
                 e.getMessage(),
                 command.getCorrelationId()
@@ -363,7 +363,7 @@ public class SagaCommandHandler implements SagaCommandPort {
         pdfSignedEventPort.publishPdfSignedNotification(
             command.getSagaId(),
             command.getDocumentId(),
-            command.getInvoiceNumber(),
+            command.getDocumentNumber(),
             command.getDocumentType(),
             document.getId().toString(),
             document.getSignedPdfUrl(),

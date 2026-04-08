@@ -5,8 +5,8 @@
 -- ============================================================
 CREATE TABLE signed_pdf_documents (
     id                  UUID            PRIMARY KEY,
-    invoice_id          VARCHAR(100)    NOT NULL,
-    invoice_number      VARCHAR(50)     NOT NULL,
+    document_id         VARCHAR(100)    NOT NULL,
+    document_number     VARCHAR(50)     NOT NULL,
     document_type       VARCHAR(50)     NOT NULL DEFAULT 'INVOICE',
     original_pdf_url    VARCHAR(500)    NOT NULL,
     original_pdf_size   BIGINT          NOT NULL,
@@ -26,16 +26,16 @@ CREATE TABLE signed_pdf_documents (
     correlation_id      VARCHAR(100)
 );
 
-CREATE UNIQUE INDEX idx_signed_pdf_invoice_id       ON signed_pdf_documents(invoice_id);
+CREATE UNIQUE INDEX idx_signed_pdf_document_id       ON signed_pdf_documents(document_id);
 CREATE        INDEX idx_signed_pdf_status           ON signed_pdf_documents(status);
-CREATE        INDEX idx_signed_pdf_invoice_number   ON signed_pdf_documents(invoice_number);
+CREATE        INDEX idx_signed_pdf_document_number   ON signed_pdf_documents(document_number);
 CREATE        INDEX idx_signed_pdf_document_type    ON signed_pdf_documents(document_type);
 CREATE        INDEX idx_signed_pdf_created_at       ON signed_pdf_documents(created_at);
 
 COMMENT ON TABLE  signed_pdf_documents                          IS 'Stores signed PDF document metadata and signing status';
 COMMENT ON COLUMN signed_pdf_documents.id                       IS 'Primary key (UUID)';
-COMMENT ON COLUMN signed_pdf_documents.invoice_id               IS 'Reference to invoice (unique for idempotency)';
-COMMENT ON COLUMN signed_pdf_documents.invoice_number           IS 'Human-readable invoice identifier';
+COMMENT ON COLUMN signed_pdf_documents.document_id              IS 'Reference to document (unique for idempotency)';
+COMMENT ON COLUMN signed_pdf_documents.document_number          IS 'Human-readable document identifier';
 COMMENT ON COLUMN signed_pdf_documents.document_type            IS 'Document type: INVOICE, TAX_INVOICE, etc.';
 COMMENT ON COLUMN signed_pdf_documents.original_pdf_url         IS 'URL of the unsigned PDF from pdf-generation-service';
 COMMENT ON COLUMN signed_pdf_documents.signed_pdf_path          IS 'Filesystem path to the signed PDF';

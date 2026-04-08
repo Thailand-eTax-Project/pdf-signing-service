@@ -10,8 +10,8 @@ public interface PdfSignedEventPort {
 
     void publishPdfSignedNotification(
             String sagaId,
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String documentType,
             String signedDocumentId,
             String signedPdfUrl,
@@ -22,8 +22,8 @@ public interface PdfSignedEventPort {
 
     void publishPdfSigningFailureNotification(
             String sagaId,
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String documentType,
             String errorMessage,
             String correlationId);
