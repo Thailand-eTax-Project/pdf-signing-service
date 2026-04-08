@@ -63,8 +63,8 @@ public class SagaRouteConfig extends RouteBuilder {
                         .unmarshal().json(JsonLibrary.Jackson, ProcessPdfSigningCommand.class)
                         .process(exchange -> {
                                 ProcessPdfSigningCommand cmd = exchange.getIn().getBody(ProcessPdfSigningCommand.class);
-                                log.info("Processing saga command for saga: {}, invoice: {}",
-                                                cmd.getSagaId(), cmd.getInvoiceNumber());
+                                log.info("Processing saga command for saga: {}, document: {}",
+                                                cmd.getSagaId(), cmd.getDocumentNumber());
                                 sagaCommandPort.handleProcessPdfSigning(cmd);
                         })
                         .log("Successfully processed saga command for sagaId: ${body.sagaId}");

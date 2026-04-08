@@ -24,8 +24,8 @@ public class ProcessPdfSigningCommand extends SagaCommand {
     @JsonProperty("documentId")
     private final String documentId;
 
-    @JsonProperty("invoiceNumber")
-    private final String invoiceNumber;
+    @JsonProperty("documentNumber")
+    private final String documentNumber;
 
     @JsonProperty("documentType")
     private final String documentType;
@@ -53,7 +53,7 @@ public class ProcessPdfSigningCommand extends SagaCommand {
         @JsonProperty("sagaStep") SagaStep sagaStep,
         @JsonProperty("correlationId") String correlationId,
         @JsonProperty("documentId") String documentId,
-        @JsonProperty("invoiceNumber") String invoiceNumber,
+        @JsonProperty("documentNumber") String documentNumber,
         @JsonProperty("documentType") String documentType,
         @JsonProperty("pdfUrl") String pdfUrl,
         @JsonProperty("pdfSize") Long pdfSize,
@@ -61,7 +61,7 @@ public class ProcessPdfSigningCommand extends SagaCommand {
     ) {
         super(eventId, occurredAt, eventType, version, sagaId, sagaStep, correlationId);
         this.documentId = documentId;
-        this.invoiceNumber = invoiceNumber;
+        this.documentNumber = documentNumber;
         this.documentType = documentType;
         this.pdfUrl = pdfUrl;
         this.pdfSize = pdfSize;
@@ -72,11 +72,11 @@ public class ProcessPdfSigningCommand extends SagaCommand {
      * Convenience constructor for testing.
      */
     public ProcessPdfSigningCommand(String sagaId, SagaStep sagaStep, String correlationId,
-                                    String documentId, String invoiceNumber, String documentType,
+                                    String documentId, String documentNumber, String documentType,
                                     String pdfUrl, Long pdfSize, Boolean xmlEmbedded) {
         super(sagaId, sagaStep, correlationId);
         this.documentId = documentId;
-        this.invoiceNumber = invoiceNumber;
+        this.documentNumber = documentNumber;
         this.documentType = documentType;
         this.pdfUrl = pdfUrl;
         this.pdfSize = pdfSize;

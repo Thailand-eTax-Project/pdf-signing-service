@@ -33,13 +33,13 @@ public interface SignedPdfDocumentRepository {
     Optional<SignedPdfDocument> findById(SignedPdfDocumentId id);
 
     /**
-     * Finds a SignedPdfDocument by invoice ID.
+     * Finds a SignedPdfDocument by document ID.
      * Used for idempotency checks.
      *
-     * @param invoiceId the invoice ID
+     * @param documentId the document ID
      * @return Optional containing the document if found
      */
-    Optional<SignedPdfDocument> findByInvoiceId(String invoiceId);
+    Optional<SignedPdfDocument> findByDocumentId(String documentId);
 
     /**
      * Finds all SignedPdfDocuments with a specific status.
@@ -50,13 +50,13 @@ public interface SignedPdfDocumentRepository {
     List<SignedPdfDocument> findByStatus(SigningStatus status);
 
     /**
-     * Checks if a SignedPdfDocument exists for the given invoice ID.
+     * Checks if a SignedPdfDocument exists for the given document ID.
      * Used for idempotency checks before creating new documents.
      *
-     * @param invoiceId the invoice ID
+     * @param documentId the document ID
      * @return true if a document exists, false otherwise
      */
-    boolean existsByInvoiceId(String invoiceId);
+    boolean existsByDocumentId(String documentId);
 
     /**
      * Deletes a SignedPdfDocument by its ID.

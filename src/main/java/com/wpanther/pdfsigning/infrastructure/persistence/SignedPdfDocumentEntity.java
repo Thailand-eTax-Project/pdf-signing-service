@@ -35,11 +35,11 @@ public class SignedPdfDocumentEntity {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "invoice_id", nullable = false, unique = true, length = 100)
-    private String invoiceId;
+    @Column(name = "document_id", nullable = false, unique = true, length = 100)
+    private String documentId;
 
-    @Column(name = "invoice_number", nullable = false, length = 50)
-    private String invoiceNumber;
+    @Column(name = "document_number", nullable = false, length = 50)
+    private String documentNumber;
 
     @Column(name = "document_type", length = 50)
     private String documentType;

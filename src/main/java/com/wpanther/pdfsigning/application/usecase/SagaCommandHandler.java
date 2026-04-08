@@ -72,7 +72,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             command.getSagaId(), command.getDocumentId(), command.getDocumentType());
 
         // 1. Check idempotency - use documentId (from command)
-        Optional<SignedPdfDocument> existing = documentRepository.findByInvoiceId(command.getDocumentId());
+        Optional<SignedPdfDocument> existing = documentRepository.findByDocumentId(command.getDocumentId());
 
         // 2. Already completed — idempotent reply, then return
         if (existing.isPresent() && existing.get().isCompleted()) {
@@ -93,7 +93,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             pdfSignedEventPort.publishPdfSigningFailureNotification(
                 command.getSagaId(),
                 command.getDocumentId(),
-                command.getInvoiceNumber(),
+                command.getDocumentNumber(),
                 command.getDocumentType(),
                 "Maximum retry attempts exceeded for PDF signing",
                 command.getCorrelationId()
@@ -107,7 +107,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             SignedPdfDocument document = existing.orElseGet(() ->
                 SignedPdfDocument.create(
                     command.getDocumentId(),
-                    command.getInvoiceNumber(),
+                    command.getDocumentNumber(),
                     command.getPdfUrl(),
                     command.getPdfSize(),
                     command.getCorrelationId(),
@@ -154,7 +154,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             pdfSignedEventPort.publishPdfSignedNotification(
                 command.getSagaId(),
                 command.getDocumentId(),
-                command.getInvoiceNumber(),
+                command.getDocumentNumber(),
                 command.getDocumentType(),
                 document.getId().toString(),
                 result.signedPdfUrl(),
@@ -173,7 +173,7 @@ public class SagaCommandHandler implements SagaCommandPort {
                 command.getDocumentId(), command.getSagaId(), e);
 
             // Get the document to mark as failed
-            documentRepository.findByInvoiceId(command.getDocumentId()).ifPresent(document -> {
+            documentRepository.findByDocumentId(command.getDocumentId()).ifPresent(document -> {
                 document.markFailed(e.getMessage());
                 document.incrementRetryCount();
                 documentRepository.save(document);
@@ -189,7 +189,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             pdfSignedEventPort.publishPdfSigningFailureNotification(
                 command.getSagaId(),
                 command.getDocumentId(),
-                command.getInvoiceNumber(),
+                command.getDocumentNumber(),
                 command.getDocumentType(),
                 e.getMessage(),
                 command.getCorrelationId()
@@ -200,7 +200,7 @@ public class SagaCommandHandler implements SagaCommandPort {
                 command.getDocumentId(), command.getSagaId(), e);
 
             // Get the document to mark as failed
-            documentRepository.findByInvoiceId(command.getDocumentId()).ifPresent(document -> {
+            documentRepository.findByDocumentId(command.getDocumentId()).ifPresent(document -> {
                 document.markFailed(e.getMessage());
                 document.incrementRetryCount();
                 documentRepository.save(document);
@@ -216,7 +216,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             pdfSignedEventPort.publishPdfSigningFailureNotification(
                 command.getSagaId(),
                 command.getDocumentId(),
-                command.getInvoiceNumber(),
+                command.getDocumentNumber(),
                 command.getDocumentType(),
                 e.getMessage(),
                 command.getCorrelationId()
@@ -244,7 +244,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             command.getSagaId(), command.getDocumentId());
 
         // 1. Find the signed document
-        Optional<SignedPdfDocument> existing = documentRepository.findByInvoiceId(command.getDocumentId());
+        Optional<SignedPdfDocument> existing = documentRepository.findByDocumentId(command.getDocumentId());
 
         if (existing.isEmpty()) {
             log.info("No signed document found for documentId={}, compensation already done or never existed",
@@ -363,7 +363,7 @@ public class SagaCommandHandler implements SagaCommandPort {
         pdfSignedEventPort.publishPdfSignedNotification(
             command.getSagaId(),
             command.getDocumentId(),
-            command.getInvoiceNumber(),
+            command.getDocumentNumber(),
             command.getDocumentType(),
             document.getId().toString(),
             document.getSignedPdfUrl(),

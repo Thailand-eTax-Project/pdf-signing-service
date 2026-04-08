@@ -38,8 +38,8 @@ public class OutboxPdfSignedEventAdapter implements PdfSignedEventPort {
     @Transactional(propagation = Propagation.MANDATORY)
     public void publishPdfSignedNotification(
             String sagaId,
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String documentType,
             String signedDocumentId,
             String signedPdfUrl,
@@ -49,7 +49,7 @@ public class OutboxPdfSignedEventAdapter implements PdfSignedEventPort {
             String correlationId) {
 
         PdfSignedNotificationEvent notification = PdfSignedNotificationEvent.create(
-            sagaId, invoiceId, invoiceNumber, documentType,
+            sagaId, documentId, documentNumber, documentType,
             signedDocumentId, signedPdfUrl, signedPdfSize,
             signatureLevel, signatureTimestamp, correlationId
         );
@@ -58,20 +58,20 @@ public class OutboxPdfSignedEventAdapter implements PdfSignedEventPort {
         headers.put("eventType", "PdfSigned");
         headers.put("documentType", documentType);
         headers.put("correlationId", correlationId);
-        headers.put("invoiceId", invoiceId);
+        headers.put("documentId", documentId);
 
-        // Use invoiceId as partition key for all events of the same invoice
+        // Use documentId as partition key for all events of the same document
         outboxService.saveWithRouting(
             notification,
             "SignedPdfDocument",
             signedDocumentId,
             kafkaProperties.getTopics().getNotificationEvents(),
-            invoiceId,  // Partition by invoiceId for ordering
+            documentId,  // Partition by documentId for ordering
             toJson(headers)
         );
 
-        log.info("Published PdfSigned notification for invoiceId={}, invoiceNumber={}, documentType={}",
-            invoiceId, invoiceNumber, documentType);
+        log.info("Published PdfSigned notification for documentId={}, documentNumber={}, documentType={}",
+            documentId, documentNumber, documentType);
     }
 
     /**
@@ -81,14 +81,14 @@ public class OutboxPdfSignedEventAdapter implements PdfSignedEventPort {
     @Transactional(propagation = Propagation.MANDATORY)
     public void publishPdfSigningFailureNotification(
             String sagaId,
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String documentType,
             String errorMessage,
             String correlationId) {
 
         PdfSigningFailedNotificationEvent notification = PdfSigningFailedNotificationEvent.create(
-            sagaId, invoiceId, invoiceNumber, documentType,
+            sagaId, documentId, documentNumber, documentType,
             errorMessage, correlationId
         );
 
@@ -96,22 +96,22 @@ public class OutboxPdfSignedEventAdapter implements PdfSignedEventPort {
         headers.put("eventType", "PdfSigningFailed");
         headers.put("documentType", documentType);
         headers.put("correlationId", correlationId);
-        headers.put("invoiceId", invoiceId);
+        headers.put("documentId", documentId);
 
         try {
             outboxService.saveWithRouting(
                 notification,
                 "SignedPdfDocument",
-                invoiceId,
+                documentId,
                 kafkaProperties.getTopics().getNotificationEvents(),
-                invoiceId,
+                documentId,
                 toJson(headers)
             );
 
-            log.warn("Published PdfSigningFailed notification for invoiceId={}, error={}",
-                invoiceId, errorMessage);
+            log.warn("Published PdfSigningFailed notification for documentId={}, error={}",
+                documentId, errorMessage);
         } catch (Exception e) {
-            log.error("Failed to publish failure notification for invoiceId={}", invoiceId, e);
+            log.error("Failed to publish failure notification for documentId={}", documentId, e);
         }
     }
 

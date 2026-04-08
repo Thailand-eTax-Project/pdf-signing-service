@@ -23,7 +23,7 @@ class ProcessPdfSigningCommandTest {
         SagaStep sagaStep = SagaStep.SIGN_PDF;
         String correlationId = "corr-456";
         String documentId = "doc-789";
-        String invoiceNumber = "INV-2024-001";
+        String documentNumber = "DOC-2024-001";
         String documentType = "INVOICE";
         String pdfUrl = "http://example.com/file.pdf";
         Long pdfSize = 12345L;
@@ -32,7 +32,7 @@ class ProcessPdfSigningCommandTest {
         // When
         ProcessPdfSigningCommand command = new ProcessPdfSigningCommand(
             sagaId, sagaStep, correlationId,
-            documentId, invoiceNumber, documentType,
+            documentId, documentNumber, documentType,
             pdfUrl, pdfSize, xmlEmbedded
         );
 
@@ -41,7 +41,7 @@ class ProcessPdfSigningCommandTest {
         assertThat(command.getSagaStep()).isEqualTo(sagaStep);
         assertThat(command.getCorrelationId()).isEqualTo(correlationId);
         assertThat(command.getDocumentId()).isEqualTo(documentId);
-        assertThat(command.getInvoiceNumber()).isEqualTo(invoiceNumber);
+        assertThat(command.getDocumentNumber()).isEqualTo(documentNumber);
         assertThat(command.getDocumentType()).isEqualTo(documentType);
         assertThat(command.getPdfUrl()).isEqualTo(pdfUrl);
         assertThat(command.getPdfSize()).isEqualTo(pdfSize);
@@ -61,7 +61,7 @@ class ProcessPdfSigningCommandTest {
         ProcessPdfSigningCommand command = new ProcessPdfSigningCommand(
             eventId, occurredAt, eventType, version,
             "saga-123", SagaStep.SIGN_PDF, "corr-456",
-            "doc-789", "INV-2024-001", "INVOICE",
+            "doc-789", "DOC-2024-001", "INVOICE",
             "http://example.com/file.pdf", 12345L, true
         );
 

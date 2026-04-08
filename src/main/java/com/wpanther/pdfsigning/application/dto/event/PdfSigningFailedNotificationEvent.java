@@ -22,11 +22,11 @@ public class PdfSigningFailedNotificationEvent extends TraceEvent {
     private static final String TRACE_TYPE = "PdfSigningFailed";
     private static final String SOURCE = "pdf-signing-service";
 
-    @JsonProperty("invoiceId")
-    private final String invoiceId;
+    @JsonProperty("documentId")
+    private final String documentId;
 
-    @JsonProperty("invoiceNumber")
-    private final String invoiceNumber;
+    @JsonProperty("documentNumber")
+    private final String documentNumber;
 
     @JsonProperty("documentType")
     private final String documentType;
@@ -39,14 +39,14 @@ public class PdfSigningFailedNotificationEvent extends TraceEvent {
      */
     public static PdfSigningFailedNotificationEvent create(
             String sagaId,
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String documentType,
             String errorMessage,
             String correlationId) {
 
         return new PdfSigningFailedNotificationEvent(
-            sagaId, invoiceId, invoiceNumber, documentType,
+            sagaId, documentId, documentNumber, documentType,
             errorMessage, correlationId
         );
     }
@@ -56,15 +56,15 @@ public class PdfSigningFailedNotificationEvent extends TraceEvent {
      */
     private PdfSigningFailedNotificationEvent(
             String sagaId,
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String documentType,
             String errorMessage,
             String correlationId) {
 
         super(sagaId, correlationId, SOURCE, TRACE_TYPE, null);
-        this.invoiceId = invoiceId;
-        this.invoiceNumber = invoiceNumber;
+        this.documentId = documentId;
+        this.documentNumber = documentNumber;
         this.documentType = documentType;
         this.errorMessage = errorMessage;
     }
@@ -83,14 +83,14 @@ public class PdfSigningFailedNotificationEvent extends TraceEvent {
         @JsonProperty("source") String source,
         @JsonProperty("traceType") String traceType,
         @JsonProperty("context") String context,
-        @JsonProperty("invoiceId") String invoiceId,
-        @JsonProperty("invoiceNumber") String invoiceNumber,
+        @JsonProperty("documentId") String documentId,
+        @JsonProperty("documentNumber") String documentNumber,
         @JsonProperty("documentType") String documentType,
         @JsonProperty("errorMessage") String errorMessage
     ) {
         super(eventId, occurredAt, eventType, version, sagaId, correlationId, source, traceType, context);
-        this.invoiceId = invoiceId;
-        this.invoiceNumber = invoiceNumber;
+        this.documentId = documentId;
+        this.documentNumber = documentNumber;
         this.documentType = documentType;
         this.errorMessage = errorMessage;
     }

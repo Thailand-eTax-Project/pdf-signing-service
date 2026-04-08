@@ -35,8 +35,8 @@ class SignedPdfDocumentTest {
 
             // Then
             assertThat(document.getId()).isNotNull();
-            assertThat(document.getInvoiceId()).isEqualTo("invoice-123");
-            assertThat(document.getInvoiceNumber()).isEqualTo("INV-2024-001");
+            assertThat(document.getDocumentId()).isEqualTo("invoice-123");
+            assertThat(document.getDocumentNumber()).isEqualTo("INV-2024-001");
             assertThat(document.getDocumentType()).isEqualTo("TAX_INVOICE");
             assertThat(document.getOriginalPdfUrl()).isEqualTo("http://example.com/test.pdf");
             assertThat(document.getOriginalPdfSize()).isEqualTo(1024L);
@@ -54,7 +54,7 @@ class SignedPdfDocumentTest {
                 "", "INV-001", "http://example.com/test.pdf", 1024L, "corr-123", "TAX_INVOICE"
             ))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("invoiceId");
+                .hasMessageContaining("documentId");
         }
 
         @Test
@@ -64,7 +64,7 @@ class SignedPdfDocumentTest {
                 "invoice-123", null, "http://example.com/test.pdf", 1024L, "corr-123", "TAX_INVOICE"
             ))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("invoiceNumber");
+                .hasMessageContaining("documentNumber");
         }
 
         @Test
