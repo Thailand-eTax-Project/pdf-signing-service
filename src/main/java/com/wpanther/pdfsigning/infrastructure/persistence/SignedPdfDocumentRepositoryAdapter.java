@@ -40,8 +40,8 @@ public class SignedPdfDocumentRepositoryAdapter implements SignedPdfDocumentRepo
     }
 
     @Override
-    public Optional<SignedPdfDocument> findByInvoiceId(String invoiceId) {
-        return jpaRepository.findByInvoiceId(invoiceId)
+    public Optional<SignedPdfDocument> findByDocumentId(String documentId) {
+        return jpaRepository.findByDocumentId(documentId)
                 .map(mapper::toDomain);
     }
 
@@ -53,8 +53,8 @@ public class SignedPdfDocumentRepositoryAdapter implements SignedPdfDocumentRepo
     }
 
     @Override
-    public boolean existsByInvoiceId(String invoiceId) {
-        return jpaRepository.existsByInvoiceId(invoiceId);
+    public boolean existsByDocumentId(String documentId) {
+        return jpaRepository.existsByDocumentId(documentId);
     }
 
     @Override

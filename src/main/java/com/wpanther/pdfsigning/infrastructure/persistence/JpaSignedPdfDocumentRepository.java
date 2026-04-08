@@ -17,12 +17,12 @@ import java.util.UUID;
 public interface JpaSignedPdfDocumentRepository extends JpaRepository<SignedPdfDocumentEntity, UUID> {
 
     /**
-     * Finds a SignedPdfDocumentEntity by invoice ID.
+     * Finds a SignedPdfDocumentEntity by document ID.
      *
-     * @param invoiceId the invoice ID
+     * @param documentId the document ID
      * @return Optional containing the entity if found
      */
-    Optional<SignedPdfDocumentEntity> findByInvoiceId(String invoiceId);
+    Optional<SignedPdfDocumentEntity> findByDocumentId(String documentId);
 
     /**
      * Finds all SignedPdfDocumentEntities with a specific status.
@@ -33,10 +33,10 @@ public interface JpaSignedPdfDocumentRepository extends JpaRepository<SignedPdfD
     List<SignedPdfDocumentEntity> findByStatus(SigningStatus status);
 
     /**
-     * Checks if a SignedPdfDocumentEntity exists for the given invoice ID.
+     * Checks if a SignedPdfDocumentEntity exists for the given document ID.
      *
-     * @param invoiceId the invoice ID
+     * @param documentId the document ID
      * @return true if an entity exists, false otherwise
      */
-    boolean existsByInvoiceId(String invoiceId);
+    boolean existsByDocumentId(String documentId);
 }
