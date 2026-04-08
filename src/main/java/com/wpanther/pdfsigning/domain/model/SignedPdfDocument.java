@@ -30,8 +30,8 @@ public class SignedPdfDocument {
     public static final int MAX_RETRY_ATTEMPTS = 3;
 
     private final SignedPdfDocumentId id;
-    private final String invoiceId;
-    private final String invoiceNumber;
+    private final String documentId;
+    private final String documentNumber;
     private final String documentType;
     private final String originalPdfUrl;
     private final Long originalPdfSize;
@@ -56,8 +56,8 @@ public class SignedPdfDocument {
     /**
      * Creates a new SignedPdfDocument in PENDING state.
      *
-     * @param invoiceId invoice identifier
-     * @param invoiceNumber human-readable invoice number
+     * @param documentId document identifier
+     * @param documentNumber human-readable document number
      * @param originalPdfUrl URL of the unsigned PDF
      * @param originalPdfSize size of the unsigned PDF in bytes
      * @param correlationId correlation ID for tracing
@@ -65,15 +65,15 @@ public class SignedPdfDocument {
      * @return new SignedPdfDocument in PENDING state
      */
     public static SignedPdfDocument create(
-            String invoiceId,
-            String invoiceNumber,
+            String documentId,
+            String documentNumber,
             String originalPdfUrl,
             Long originalPdfSize,
             String correlationId,
             String documentType) {
 
-        validateNotBlank(invoiceId, "invoiceId");
-        validateNotBlank(invoiceNumber, "invoiceNumber");
+        validateNotBlank(documentId, "documentId");
+        validateNotBlank(documentNumber, "documentNumber");
         validateNotBlank(originalPdfUrl, "originalPdfUrl");
         validateNotNull(originalPdfSize, "originalPdfSize");
 
@@ -81,8 +81,8 @@ public class SignedPdfDocument {
 
         return SignedPdfDocument.builder()
                 .id(SignedPdfDocumentId.generate())
-                .invoiceId(invoiceId)
-                .invoiceNumber(invoiceNumber)
+                .documentId(documentId)
+                .documentNumber(documentNumber)
                 .documentType(documentType)
                 .originalPdfUrl(originalPdfUrl)
                 .originalPdfSize(originalPdfSize)
