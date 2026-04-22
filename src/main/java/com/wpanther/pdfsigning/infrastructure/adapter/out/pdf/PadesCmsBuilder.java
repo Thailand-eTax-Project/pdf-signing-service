@@ -4,6 +4,7 @@ import com.wpanther.pdfsigning.domain.model.SigningException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -160,36 +161,42 @@ public class PadesCmsBuilder {
         @Override
         @SuppressWarnings("rawtypes") // BouncyCastle CMSAttributeTableGenerator declares raw Map; no generic variant exists
         public AttributeTable getAttributes(Map params) {
-            Hashtable<ASN1ObjectIdentifier, ASN1Encodable> attributes = new Hashtable<>();
-
             try {
+                ASN1Sequence signingCertV2 = buildSigningCertificateV2();
+
+                Hashtable<ASN1ObjectIdentifier, ASN1Encodable> attributes = new Hashtable<>();
                 attributes.put(
                     PKCSObjectIdentifiers.pkcs_9_at_contentType,
-                    new ASN1ObjectIdentifier("1.2.840.113549.1.7.1") // id-data
+                    new Attribute(
+                        PKCSObjectIdentifiers.pkcs_9_at_contentType,
+                        new DERSet(new ASN1ObjectIdentifier("1.2.840.113549.1.7.1")))
                 );
-
                 attributes.put(
                     PKCSObjectIdentifiers.pkcs_9_at_messageDigest,
-                    new DEROctetString(digest)
+                    new Attribute(
+                        PKCSObjectIdentifiers.pkcs_9_at_messageDigest,
+                        new DERSet(new DEROctetString(digest)))
                 );
-
                 attributes.put(
                     PKCSObjectIdentifiers.pkcs_9_at_signingTime,
-                    new ASN1GeneralizedTime(new Date())
+                    new Attribute(
+                        PKCSObjectIdentifiers.pkcs_9_at_signingTime,
+                        new DERSet(new ASN1UTCTime(new Date())))
                 );
-
                 attributes.put(
                     PKCSObjectIdentifiers.id_aa_signingCertificateV2,
-                    buildSigningCertificateV2()
+                    new Attribute(
+                        PKCSObjectIdentifiers.id_aa_signingCertificateV2,
+                        new DERSet(signingCertV2))
                 );
+
+                return new AttributeTable(attributes);
 
             } catch (SigningException e) {
                 throw e;
             } catch (Exception e) {
                 throw new SigningException("Failed to build PAdES signed attributes", e);
             }
-
-            return new AttributeTable(attributes);
         }
 
         private ASN1Sequence buildSigningCertificateV2() throws SigningException {

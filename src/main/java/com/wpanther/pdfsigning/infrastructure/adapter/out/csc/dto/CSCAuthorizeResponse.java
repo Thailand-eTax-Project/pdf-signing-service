@@ -18,6 +18,12 @@ import lombok.NoArgsConstructor;
 public class CSCAuthorizeResponse {
 
     /**
+     * Transaction ID for the authorization operation.
+     */
+    @JsonProperty("transactionID")
+    private String transactionID;
+
+    /**
      * Signature Activation Data token.
      * eidasremotesigning returns "sad" (lowercase) per CSC API v2.0.
      */
@@ -29,4 +35,10 @@ public class CSCAuthorizeResponse {
      */
     @JsonProperty("expiresIn")
     private Long expiresIn;
+
+    /**
+     * Authorization mode (e.g., "implicit").
+     */
+    @JsonProperty("authMode")
+    private String authMode;
 }

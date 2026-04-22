@@ -11,31 +11,51 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
- * Parses PEM-encoded certificate chains from CSC responses.
+ * Parses certificate chains from CSC responses.
  *
- * This component handles parsing of certificate chains returned by the CSC API
- * in PEM format (-----BEGIN CERTIFICATE-----...-----END CERTIFICATE-----).
+ * Handles both PEM format (-----BEGIN CERTIFICATE-----...-----END CERTIFICATE-----)
+ * and raw Base64-encoded DER format as returned by eidasremotesigning.
  */
 @Slf4j
 @Component
 public class CertificateParser {
 
     /**
-     * Parses a PEM-encoded certificate chain string into X509Certificate array.
-     *
-     * @param pemCertificate PEM-encoded certificate(s) from CSC
-     * @return Array of X509Certificate objects
-     * @throws IOException if parsing fails
+     * Parses a certificate chain string into X509Certificate array.
+     * Supports both PEM and raw Base64-encoded DER formats.
      */
-    public X509Certificate[] parseCertificateChain(String pemCertificate) throws IOException {
+    public X509Certificate[] parseCertificateChain(String certificateData) throws IOException {
         List<X509Certificate> certificates = new ArrayList<>();
 
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(pemCertificate.getBytes(StandardCharsets.UTF_8));
+        if (certificateData == null || certificateData.isBlank()) {
+            throw new IOException("Certificate data is null or empty");
+        }
+
+        String trimmed = certificateData.trim();
+
+        if (trimmed.contains("-----BEGIN")) {
+            parsePem(trimmed, certificates);
+        } else {
+            parseBase64Der(trimmed, certificates);
+        }
+
+        if (certificates.isEmpty()) {
+            throw new IOException("No certificates found in certificate data");
+        }
+
+        log.info("Parsed certificate chain with {} certificates", certificates.size());
+        return certificates.toArray(new X509Certificate[0]);
+    }
+
+    private void parsePem(String pemData, List<X509Certificate> certificates) throws IOException {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(pemData.getBytes(StandardCharsets.UTF_8));
              InputStreamReader isr = new InputStreamReader(bais, StandardCharsets.UTF_8);
              PEMParser parser = new PEMParser(isr)) {
 
@@ -47,20 +67,27 @@ public class CertificateParser {
                         X509Certificate cert = new JcaX509CertificateConverter()
                             .getCertificate(holder);
                         certificates.add(cert);
-                        log.debug("Parsed certificate: {}", cert.getSubjectDN());
+                        log.debug("Parsed PEM certificate: {}", cert.getSubjectDN());
                     } catch (CertificateException e) {
                         throw new IOException("Failed to convert certificate", e);
                     }
                 }
             }
         }
+    }
 
-        if (certificates.isEmpty()) {
-            throw new IOException("No certificates found in PEM data");
+    private void parseBase64Der(String base64Data, List<X509Certificate> certificates) throws IOException {
+        try {
+            byte[] derBytes = Base64.getDecoder().decode(base64Data);
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(derBytes)) {
+                X509Certificate cert = (X509Certificate) factory.generateCertificate(bais);
+                certificates.add(cert);
+                log.debug("Parsed Base64 DER certificate: {}", cert.getSubjectDN());
+            }
+        } catch (CertificateException e) {
+            throw new IOException("Failed to parse Base64 DER certificate", e);
         }
-
-        log.info("Parsed certificate chain with {} certificates", certificates.size());
-        return certificates.toArray(new X509Certificate[0]);
     }
 
     /**

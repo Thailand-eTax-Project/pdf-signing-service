@@ -63,7 +63,7 @@ app:
 
   csc:
     service-url: ${CSC_SERVICE_URL:http://localhost:9000}
-    auth-endpoint: /csc/v2/oauth2/authorize
+    auth-endpoint: /csc/v2/credentials/authorize
     sign-hash-endpoint: /csc/v2/signatures/signHash
     # client-id and credential-id are injected at runtime by @DynamicPropertySource
     credential-id: ${CSC_CREDENTIAL_ID:dynamic}

@@ -286,12 +286,21 @@ public abstract class AbstractFullIntegrationTest {
         String pathPart = presignedUrl.contains("?")
                 ? presignedUrl.substring(0, presignedUrl.indexOf("?"))
                 : presignedUrl;
+
+        // Path-style: http://localhost:9100/etax-signed-pdfs/signed-pdf/...
         int bucketIndex = pathPart.indexOf("/" + MINIO_BUCKET_NAME + "/");
-        if (bucketIndex < 0) {
-            throw new IllegalArgumentException(
-                    "URL does not contain bucket '" + MINIO_BUCKET_NAME + "': " + presignedUrl);
+        if (bucketIndex >= 0) {
+            return pathPart.substring(bucketIndex + MINIO_BUCKET_NAME.length() + 2);
         }
-        return pathPart.substring(bucketIndex + MINIO_BUCKET_NAME.length() + 2);
+
+        // Virtual-hosted-style: http://etax-signed-pdfs.localhost:9100/signed-pdf/...
+        String path = java.net.URI.create(pathPart).getPath();
+        if (path != null && path.startsWith("/")) {
+            return path.substring(1);
+        }
+
+        throw new IllegalArgumentException(
+                "Cannot extract S3 key from URL: " + presignedUrl);
     }
 
     // ----- Kafka helpers -----
