@@ -442,7 +442,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <excludes/>
+                            <excludes combine.self="override"/>
                             <systemPropertyVariables>
                                 <integration.tests.enabled>true</integration.tests.enabled>
                             </systemPropertyVariables>

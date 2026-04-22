@@ -49,6 +49,7 @@ public class SagaCommandHandler implements SagaCommandPort {
      * Delegates to {@link #handleProcessCommand(ProcessPdfSigningCommand)}.
      */
     @Override
+    @Transactional
     public void handleProcessPdfSigning(ProcessPdfSigningCommand command) {
         handleProcessCommand(command);
     }
@@ -58,6 +59,7 @@ public class SagaCommandHandler implements SagaCommandPort {
      * Delegates to {@link #handleCompensation(CompensatePdfSigningCommand)}.
      */
     @Override
+    @Transactional
     public void handleCompensatePdfSigning(CompensatePdfSigningCommand command) {
         handleCompensation(command);
     }
