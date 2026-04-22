@@ -8,6 +8,7 @@ import com.wpanther.pdfsigning.application.port.out.PdfGenerationPort;
 import com.wpanther.pdfsigning.application.port.out.SigningPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
@@ -26,6 +27,7 @@ import java.util.UUID;
  * with mock implementations of the ports.
  * </p>
  */
+@Service
 public class DomainPdfSigningService {
 
     private static final Logger log = LoggerFactory.getLogger(DomainPdfSigningService.class);
