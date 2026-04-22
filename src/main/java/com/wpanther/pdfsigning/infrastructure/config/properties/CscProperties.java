@@ -35,10 +35,16 @@ public class CscProperties {
 
     /**
      * Hash algorithm to use for signature operations.
-     * Default: SHA256
+     * Default: SHA-256 (format required by eidasremotesigning CSC API)
      */
-    @Pattern(regexp = "^(SHA256|SHA384|SHA512)$", message = "Hash algorithm must be SHA256, SHA384, or SHA512")
-    private String hashAlgo = "SHA256";
+    @Pattern(regexp = "^(SHA-256|SHA-384|SHA-512)$", message = "Hash algorithm must be SHA-256, SHA-384, or SHA-512")
+    private String hashAlgo = "SHA-256";
+
+    /**
+     * PIN for unlocking the BCFKS/PKCS#11 keystore.
+     * Required for BCFKS and PKCS#11 storage types. Empty for AWS KMS.
+     */
+    private String pin = "";
 
     /**
      * Certificate validation settings.

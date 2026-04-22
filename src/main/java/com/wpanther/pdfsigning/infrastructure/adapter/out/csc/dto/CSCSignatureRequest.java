@@ -69,6 +69,37 @@ public class CSCSignatureRequest {
     private Boolean async;
 
     /**
+     * Credentials for PIN-based key unlocking.
+     * Required for BCFKS/PKCS#11 storage types alongside the SAD token.
+     */
+    @JsonProperty("credentials")
+    private Credentials credentials;
+
+    /**
+     * Nested DTO for credentials (PIN-based key unlocking).
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Credentials {
+
+        @JsonProperty("pin")
+        private Pin pin;
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        public static class Pin {
+            @JsonProperty("value")
+            private String value;
+        }
+    }
+
+    /**
      * Nested DTO for signature data.
      */
     @Data

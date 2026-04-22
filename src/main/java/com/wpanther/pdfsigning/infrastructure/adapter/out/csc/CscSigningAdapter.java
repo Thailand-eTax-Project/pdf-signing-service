@@ -62,15 +62,16 @@ public class CscSigningAdapter implements SigningPort {
             Instant authIssuedAt = Instant.now();
 
             // Step 1: Authorize with CSC API to get SAD token
+            // Use standard Base64 encoding — eidasremotesigning uses Base64.getDecoder() (not URL-safe)
             log.debug("Authorizing signing operation with CSC API");
-            String base64urlDigest = Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
+            String base64Digest = Base64.getEncoder().encodeToString(digest);
             CSCAuthorizeResponse authResponse = authClient.authorize(
                 CSCAuthorizeRequest.builder()
                     .clientId(cscProperties.getClientId())
                     .credentialID(cscProperties.getCredentialId())
                     .numSignatures(String.valueOf(NUM_SIGNATURES))
                     .hashAlgo(cscProperties.getHashAlgo())
-                    .hash(new String[]{base64urlDigest})
+                    .hash(new String[]{base64Digest})
                     .build()
             );
 
@@ -79,14 +80,22 @@ public class CscSigningAdapter implements SigningPort {
             log.debug("SAD token validated successfully");
 
             // Step 3: Sign the hash via CSC API
+            // Pass PIN alongside SAD — required by eidasremotesigning to unlock BCFKS private key
             log.debug("Signing hash via CSC API");
+            String pin = cscProperties.getPin();
+            CSCSignatureRequest.Credentials credentials = (pin != null && !pin.isBlank())
+                ? CSCSignatureRequest.Credentials.builder()
+                    .pin(CSCSignatureRequest.Credentials.Pin.builder().value(pin).build())
+                    .build()
+                : null;
             CSCSignatureRequest signRequest = CSCSignatureRequest.builder()
                 .clientId(cscProperties.getClientId())
                 .credentialID(cscProperties.getCredentialId())
                 .SAD(authResponse.getSAD())
                 .hashAlgo(cscProperties.getHashAlgo())
+                .credentials(credentials)
                 .signatureData(CSCSignatureRequest.SignatureData.builder()
-                    .hashToSign(new String[]{base64urlDigest})
+                    .hashToSign(new String[]{base64Digest})
                     .build())
                 .build();
 

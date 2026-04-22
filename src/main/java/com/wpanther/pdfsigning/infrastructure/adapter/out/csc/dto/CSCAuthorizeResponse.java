@@ -18,9 +18,10 @@ import lombok.NoArgsConstructor;
 public class CSCAuthorizeResponse {
 
     /**
-     * Signature Activation Data token
+     * Signature Activation Data token.
+     * eidasremotesigning returns "sad" (lowercase) per CSC API v2.0.
      */
-    @JsonProperty("SAD")
+    @JsonProperty("sad")
     private String SAD;
 
     /**

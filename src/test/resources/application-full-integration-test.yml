@@ -47,6 +47,10 @@ eureka:
   client:
     enabled: false
 
+spring.cloud:
+  compatibility-verifier:
+    enabled: false
+
 app:
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS:localhost:9093}
@@ -64,7 +68,8 @@ app:
     # client-id and credential-id are injected at runtime by @DynamicPropertySource
     credential-id: ${CSC_CREDENTIAL_ID:dynamic}
     client-id: ${CSC_CLIENT_ID:dynamic}
-    hash-algo: SHA256
+    hash-algo: SHA-256
+    pin: eidas-signing-2024
     timeout-seconds: 60
     sad:
       min-expiry-seconds: 60

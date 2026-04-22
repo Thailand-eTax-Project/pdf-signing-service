@@ -87,11 +87,12 @@ app:
 
   csc:
     service-url: ${CSC_SERVICE_URL:http://localhost:9000}
-    auth-endpoint: /csc/v2/oauth2/authorize
+    auth-endpoint: /csc/v2/credentials/authorize
     sign-hash-endpoint: /csc/v2/signatures/signHash
     credential-id: ${CSC_CREDENTIAL_ID:default-credential}
     client-id: ${CSC_CLIENT_ID:pdf-signing-service}
-    hash-algo: SHA256
+    hash-algo: SHA-256
+    pin: ${CSC_PIN:}
     timeout-seconds: 30
     sad:
       # Minimum SAD token expiry in seconds (reject if expires sooner)
