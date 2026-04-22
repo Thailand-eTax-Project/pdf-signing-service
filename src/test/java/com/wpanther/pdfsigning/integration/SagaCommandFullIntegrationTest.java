@@ -88,6 +88,7 @@ class SagaCommandFullIntegrationTest extends AbstractFullIntegrationTest {
             sendEvent(COMMAND_TOPIC, documentId, command);
 
             Map<String, Object> doc = awaitDocumentStatus(documentId, "COMPLETED");
+            assertThat(doc.get("document_id")).isEqualTo(documentId);
             assertThat(doc.get("document_type")).isEqualTo("INVOICE");
             assertThat(doc.get("signed_pdf_url")).asString().isNotBlank();
             assertThat(doc.get("transaction_id")).asString().isNotBlank();
@@ -231,9 +232,8 @@ class SagaCommandFullIntegrationTest extends AbstractFullIntegrationTest {
             assertThat(payloadStr).contains(correlationId);
 
             JsonNode payloadNode = objectMapper.readTree(payloadStr);
-            if (payloadNode.has("signedPdfUrl")) {
-                assertThat(payloadNode.get("signedPdfUrl").asText()).isNotBlank();
-            }
+            assertThat(payloadNode.has("signedPdfUrl")).as("saga reply payload must contain signedPdfUrl").isTrue();
+            assertThat(payloadNode.get("signedPdfUrl").asText()).isNotBlank();
         }
 
         @Test
