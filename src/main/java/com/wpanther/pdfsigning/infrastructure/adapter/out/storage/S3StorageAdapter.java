@@ -7,6 +7,7 @@ import com.wpanther.pdfsigning.application.port.out.DocumentStoragePort;
 import com.wpanther.pdfsigning.infrastructure.config.properties.StorageProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -46,6 +47,7 @@ public class S3StorageAdapter implements DocumentStoragePort {
      * Constructor for Spring-managed bean.
      * S3 client and presigner are initialized via @PostConstruct after properties are injected.
      */
+    @Autowired
     public S3StorageAdapter(StorageProperties storageProperties) {
         this.storageProperties = storageProperties;
     }
