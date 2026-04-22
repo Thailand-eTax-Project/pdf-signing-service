@@ -5,8 +5,8 @@
 -- ============================================================
 CREATE TABLE signed_pdf_documents (
     id                  UUID            PRIMARY KEY,
-    document_id         VARCHAR(100)    NOT NULL,
-    document_number     VARCHAR(50)     NOT NULL,
+    document_id          VARCHAR(100)    NOT NULL,
+    document_number      VARCHAR(50)     NOT NULL,
     document_type       VARCHAR(50)     NOT NULL DEFAULT 'INVOICE',
     original_pdf_url    VARCHAR(500)    NOT NULL,
     original_pdf_size   BIGINT          NOT NULL,
@@ -34,8 +34,8 @@ CREATE        INDEX idx_signed_pdf_created_at       ON signed_pdf_documents(crea
 
 COMMENT ON TABLE  signed_pdf_documents                          IS 'Stores signed PDF document metadata and signing status';
 COMMENT ON COLUMN signed_pdf_documents.id                       IS 'Primary key (UUID)';
-COMMENT ON COLUMN signed_pdf_documents.document_id              IS 'Reference to document (unique for idempotency)';
-COMMENT ON COLUMN signed_pdf_documents.document_number          IS 'Human-readable document identifier';
+COMMENT ON COLUMN signed_pdf_documents.document_id               IS 'Reference to document (unique for idempotency)';
+COMMENT ON COLUMN signed_pdf_documents.document_number           IS 'Human-readable document identifier';
 COMMENT ON COLUMN signed_pdf_documents.document_type            IS 'Document type: INVOICE, TAX_INVOICE, etc.';
 COMMENT ON COLUMN signed_pdf_documents.original_pdf_url         IS 'URL of the unsigned PDF from pdf-generation-service';
 COMMENT ON COLUMN signed_pdf_documents.signed_pdf_path          IS 'Filesystem path to the signed PDF';
