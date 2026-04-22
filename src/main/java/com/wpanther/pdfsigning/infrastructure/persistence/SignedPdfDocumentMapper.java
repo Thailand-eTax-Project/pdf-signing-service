@@ -28,6 +28,8 @@ public interface SignedPdfDocumentMapper {
      * @return the JPA entity
      */
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "documentId", target = "documentId")
+    @Mapping(source = "documentNumber", target = "documentNumber")
     SignedPdfDocumentEntity toEntity(SignedPdfDocument domain);
 
     /**
@@ -37,6 +39,8 @@ public interface SignedPdfDocumentMapper {
      * @return the domain model
      */
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "documentId", target = "documentId")
+    @Mapping(source = "documentNumber", target = "documentNumber")
     SignedPdfDocument toDomain(SignedPdfDocumentEntity entity);
 
     /**
