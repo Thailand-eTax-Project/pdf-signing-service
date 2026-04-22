@@ -10,7 +10,7 @@ import java.util.UUID;
 
 /**
  * Notification event when PDF is signed successfully.
- * Published to: notification.events (via outbox pattern)
+ * Published to: pdf.signed (via outbox pattern)
  *
  * This is a notification event for the notification-service observer.
  * It is separate from the saga reply - the orchestrator does NOT consume this.

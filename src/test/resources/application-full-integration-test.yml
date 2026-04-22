@@ -58,7 +58,7 @@ app:
       saga-command: saga.command.pdf-signing
       saga-compensation: saga.compensation.pdf-signing
       saga-reply: saga.reply.pdf-signing
-      notification-events: notification.events
+      notification-events: pdf.signed
       dlq: pdf.signing.dlq
 
   csc:

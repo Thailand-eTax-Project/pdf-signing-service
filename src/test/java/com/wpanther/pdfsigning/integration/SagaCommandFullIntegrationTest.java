@@ -173,7 +173,7 @@ class SagaCommandFullIntegrationTest extends AbstractFullIntegrationTest {
     class OutboxEventVerification {
 
         @Test
-        @DisplayName("Should write notification.events outbox row with correct payload fields")
+        @DisplayName("Should write pdf.signed outbox row with correct payload fields")
         void shouldWritePdfSignedNotificationWithCorrectFields() throws Exception {
             String documentId = newDocumentId();
             String documentNumber = "TINV-NTF-001";
@@ -185,7 +185,7 @@ class SagaCommandFullIntegrationTest extends AbstractFullIntegrationTest {
 
             Map<String, Object> doc = awaitDocumentStatus(documentId, "COMPLETED");
 
-            // notification.events aggregate_id = SignedPdfDocument UUID (id column)
+            // pdf.signed aggregate_id = SignedPdfDocument UUID (id column)
             String signedDocumentId = doc.get("id").toString();
             awaitOutboxEventCount(signedDocumentId, 1);
 
@@ -193,7 +193,7 @@ class SagaCommandFullIntegrationTest extends AbstractFullIntegrationTest {
             assertThat(notificationEvents).hasSize(1);
 
             Map<String, Object> event = notificationEvents.get(0);
-            assertThat(event.get("topic")).isEqualTo("notification.events");
+            assertThat(event.get("topic")).isEqualTo("pdf.signed");
             assertThat(event.get("aggregate_type")).isEqualTo("SignedPdfDocument");
 
             JsonNode payload = objectMapper.readTree((String) event.get("payload"));
@@ -237,7 +237,7 @@ class SagaCommandFullIntegrationTest extends AbstractFullIntegrationTest {
         }
 
         @Test
-        @DisplayName("Should write both notification.events and saga.reply outbox rows atomically")
+        @DisplayName("Should write both pdf.signed and saga.reply outbox rows atomically")
         void shouldWriteBothOutboxEventsAtomically() throws Exception {
             String documentId = newDocumentId();
             String correlationId = newCorrelationId();
@@ -255,7 +255,7 @@ class SagaCommandFullIntegrationTest extends AbstractFullIntegrationTest {
 
             List<Map<String, Object>> allEvents = getAllOutboxEvents();
             long notificationCount = allEvents.stream()
-                    .filter(e -> "notification.events".equals(e.get("topic"))).count();
+                    .filter(e -> "pdf.signed".equals(e.get("topic"))).count();
             long sagaReplyCount = allEvents.stream()
                     .filter(e -> "saga.reply.pdf-signing".equals(e.get("topic"))).count();
 

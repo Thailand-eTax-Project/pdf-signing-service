@@ -28,13 +28,13 @@ class OutboxPdfSignedEventAdapterTest {
     @BeforeEach
     void setUp() {
         KafkaProperties.Topics topics = new KafkaProperties.Topics();
-        topics.setNotificationEvents("notification.events");
+        topics.setNotificationEvents("pdf.signed");
         when(kafkaProperties.getTopics()).thenReturn(topics);
         adapter = new OutboxPdfSignedEventAdapter(outboxService, new ObjectMapper(), kafkaProperties);
     }
 
     @Test
-    @DisplayName("publishPdfSignedNotification routes to notification.events topic")
+    @DisplayName("publishPdfSignedNotification routes to pdf.signed topic")
     void publishPdfSignedNotification_routesToNotificationTopic() {
         adapter.publishPdfSignedNotification(
             "saga-1", "inv-1", "INV-001", "TAX_INVOICE",
@@ -44,12 +44,12 @@ class OutboxPdfSignedEventAdapterTest {
 
         verify(outboxService).saveWithRouting(
             any(), eq("SignedPdfDocument"), any(),
-            eq("notification.events"), eq("inv-1"), any()
+            eq("pdf.signed"), eq("inv-1"), any()
         );
     }
 
     @Test
-    @DisplayName("publishPdfSigningFailureNotification routes to notification.events topic")
+    @DisplayName("publishPdfSigningFailureNotification routes to pdf.signed topic")
     void publishPdfSigningFailureNotification_routesToNotificationTopic() {
         adapter.publishPdfSigningFailureNotification(
             "saga-1", "inv-1", "INV-001", "TAX_INVOICE",
@@ -58,7 +58,7 @@ class OutboxPdfSignedEventAdapterTest {
 
         verify(outboxService).saveWithRouting(
             any(), eq("SignedPdfDocument"), any(),
-            eq("notification.events"), eq("inv-1"), any()
+            eq("pdf.signed"), eq("inv-1"), any()
         );
     }
 }

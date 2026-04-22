@@ -26,7 +26,7 @@ import static org.awaitility.Awaitility.await;
  *   <li>Service processes command, writes outbox rows to PostgreSQL</li>
  *   <li>Debezium CDC captures outbox table changes and publishes to Kafka</li>
  *   <li>Test consumer verifies messages arrive on {@code saga.reply.pdf-signing}
- *       and {@code notification.events}</li>
+ *       and {@code pdf.signed}</li>
  * </ol>
  *
  * <p>This is the "last mile" test — outbox DB verification alone (SagaCommandFullIntegrationTest)
@@ -53,7 +53,7 @@ class KafkaPublishingIntegrationTest extends AbstractFullIntegrationTest {
 
     private static final String COMMAND_TOPIC = "saga.command.pdf-signing";
     private static final String SAGA_REPLY_TOPIC = "saga.reply.pdf-signing";
-    private static final String NOTIFICATION_TOPIC = "notification.events";
+    private static final String NOTIFICATION_TOPIC = "pdf.signed";
     private static final Duration KAFKA_POLL_TIMEOUT = Duration.ofSeconds(2);
 
     // =========================================================================
@@ -153,11 +153,11 @@ class KafkaPublishingIntegrationTest extends AbstractFullIntegrationTest {
     // =========================================================================
 
     @Nested
-    @DisplayName("notification.events Kafka delivery")
+    @DisplayName("pdf.signed Kafka delivery")
     class NotificationKafkaDelivery {
 
         @Test
-        @DisplayName("PdfSignedNotification should arrive on notification.events Kafka topic")
+        @DisplayName("PdfSignedNotification should arrive on pdf.signed Kafka topic")
         void shouldPublishPdfSignedNotificationToKafka() throws Exception {
             String documentId = newDocumentId();
             String documentNumber = "TINV-NTFK-001";

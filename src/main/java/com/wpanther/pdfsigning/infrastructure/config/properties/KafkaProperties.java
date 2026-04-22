@@ -76,10 +76,10 @@ public class KafkaProperties {
 
         /**
          * Topic for publishing notification events to notification-service.
-         * Default: notification.events
+         * Default: pdf.signed
          */
         @NotBlank(message = "Notification events topic must not be blank")
-        private String notificationEvents = "notification.events";
+        private String notificationEvents = "pdf.signed";
 
         /**
          * Dead Letter Queue topic for failed messages.

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  *
  * Produces to:
  * - saga.reply.pdf-signing (via outbox + Debezium CDC to orchestrator)
- * - notification.events (via outbox + Debezium CDC to notification-service)
+ * - pdf.signed (via outbox + Debezium CDC to notification-service)
  */
 @Component
 @RequiredArgsConstructor
