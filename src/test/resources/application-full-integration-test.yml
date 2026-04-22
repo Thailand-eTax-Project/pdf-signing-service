@@ -1,0 +1,138 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: pdf-signing-service-full-integration-test
+
+  main:
+    allow-bean-definition-overriding: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/pdfsigning_db
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 10000
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9093}
+    consumer:
+      group-id: pdf-signing-full-integration-test
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+camel:
+  springboot:
+    name: pdf-signing-camel-full-integration-test
+    main-run-controller: false
+  dataformat:
+    jackson:
+      auto-discover-object-mapper: true
+
+eureka:
+  client:
+    enabled: false
+
+app:
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9093}
+    topics:
+      saga-command: saga.command.pdf-signing
+      saga-compensation: saga.compensation.pdf-signing
+      saga-reply: saga.reply.pdf-signing
+      notification-events: notification.events
+      dlq: pdf.signing.dlq
+
+  csc:
+    service-url: ${CSC_SERVICE_URL:http://localhost:9000}
+    auth-endpoint: /csc/v2/oauth2/authorize
+    sign-hash-endpoint: /csc/v2/signatures/signHash
+    # client-id and credential-id are injected at runtime by @DynamicPropertySource
+    credential-id: ${CSC_CREDENTIAL_ID:dynamic}
+    client-id: ${CSC_CLIENT_ID:dynamic}
+    hash-algo: SHA256
+    timeout-seconds: 60
+    sad:
+      min-expiry-seconds: 60
+      max-expiry-seconds: 3600
+    cert:
+      validation:
+        enabled: true
+      max-validity-days: 365
+      min-validity-remaining-days: 7
+
+  pades:
+    level: BASELINE_B
+
+  storage:
+    provider: s3
+    s3:
+      bucket-name: etax-signed-pdfs
+      region: us-east-1
+      access-key: minioadmin
+      secret-key: minioadmin
+      endpoint: http://localhost:9100
+      path-style-access: true
+      presigned-url-ttl-minutes: 60
+
+  pdf:
+    max-size-bytes: 10485760
+
+saga:
+  outbox:
+    cleanup:
+      enabled: false
+    publisher:
+      batch-size: 100
+      poll-interval-millis: 1000
+      max-retries: 3
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      csc-auth:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 60s
+      csc-sign-hash:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 60s
+  timelimiter:
+    instances:
+      csc-auth:
+        timeoutDuration: 60s
+      csc-sign-hash:
+        timeoutDuration: 60s
+
+management:
+  health:
+    circuitbreakers:
+      enabled: false
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    root: WARN
+    com.wpanther.pdfsigning: TRACE
+    org.apache.camel: INFO
+    org.apache.camel.component.kafka: DEBUG
+    feign: DEBUG
