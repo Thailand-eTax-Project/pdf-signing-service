@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -302,32 +300,23 @@ public class SagaCommandHandler implements SagaCommandPort {
     }
 
     /**
-     * Sends COMPENSATED reply, registering it via TransactionSynchronization so it
-     * only fires after the transaction commits (ensuring the DB delete is persisted first).
-     * In unit test context (no transaction), sends immediately.
+     * Saves COMPENSATED reply to outbox within the current transaction.
+     *
+     * <p>The transactional outbox pattern guarantees atomicity: if the TX commits,
+     * both the DB delete and the outbox row are persisted; if it rolls back, neither is.
+     * Calling this directly inside {@code @Transactional} is correct — the outbox row
+     * is only visible to CDC after the TX commits, which is exactly what afterCommit()
+     * was trying to achieve but couldn't because {@code Propagation.MANDATORY} fails
+     * when the transaction has already been committed.</p>
      */
     private void sendCompensated(CompensatePdfSigningCommand command) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    sagaReplyPort.publishCompensated(
-                        command.getSagaId(),
-                        command.getSagaStep(),
-                        command.getCorrelationId()
-                    );
-                    log.info("Compensation committed, COMPENSATED reply sent for sagaId={}, documentId={}",
-                        command.getSagaId(), command.getDocumentId());
-                }
-            });
-        } else {
-            // No active transaction - send immediately (unit test context)
-            sagaReplyPort.publishCompensated(
-                command.getSagaId(),
-                command.getSagaStep(),
-                command.getCorrelationId()
-            );
-        }
+        sagaReplyPort.publishCompensated(
+            command.getSagaId(),
+            command.getSagaStep(),
+            command.getCorrelationId()
+        );
+        log.info("Compensation COMPENSATED reply saved to outbox for sagaId={}, documentId={}",
+            command.getSagaId(), command.getDocumentId());
     }
 
     /**
