@@ -53,7 +53,7 @@ public class SagaRouteConfig extends RouteBuilder {
         from("kafka:" + sagaCommandTopic
                         + "?brokers=" + kafkaBrokers
                         + "&groupId=" + kafkaProperties.getCommandConsumerGroup()
-                        + "&autoOffsetReset=earliest"
+                        + "&autoOffsetReset=" + kafkaProperties.getAutoOffsetReset()
                         + "&autoCommitEnable=false"
                         + "&breakOnFirstError=true"
                         + "&maxPollRecords=100"
@@ -75,7 +75,7 @@ public class SagaRouteConfig extends RouteBuilder {
         from("kafka:" + sagaCompensationTopic
                         + "?brokers=" + kafkaBrokers
                         + "&groupId=" + kafkaProperties.getCompensationConsumerGroup()
-                        + "&autoOffsetReset=earliest"
+                        + "&autoOffsetReset=" + kafkaProperties.getAutoOffsetReset()
                         + "&autoCommitEnable=false"
                         + "&breakOnFirstError=true"
                         + "&maxPollRecords=100"
