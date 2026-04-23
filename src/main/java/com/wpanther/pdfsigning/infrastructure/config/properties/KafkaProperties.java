@@ -43,13 +43,6 @@ public class KafkaProperties {
     private String compensationConsumerGroup = "pdf-signing-service-compensation";
 
     /**
-     * Auto offset reset policy for Camel Kafka consumers.
-     * Use "earliest" for production (process all unread messages) and
-     * "latest" for integration tests (skip stale messages from previous runs).
-     */
-    private String autoOffsetReset = "earliest";
-
-    /**
      * Topic configuration for various Kafka topics.
      */
     private final Topics topics = new Topics();

@@ -9,8 +9,6 @@ import com.wpanther.pdfsigning.integration.config.FullIntegrationTestConfigurati
 import com.wpanther.pdfsigning.integration.config.TestKafkaProducerConfig;
 import com.wpanther.pdfsigning.integration.support.EidasRemoteSigningTestHelper;
 import com.wpanther.saga.domain.enums.SagaStep;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -87,8 +85,6 @@ public abstract class AbstractFullIntegrationTest {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractFullIntegrationTest.class);
 
-    private static final String TEST_RUN_ID = String.valueOf(System.currentTimeMillis());
-
     private static final String EIDAS_BASE_URL = "http://localhost:9000";
     private static final String EIDAS_PG_JDBC_URL = "jdbc:postgresql://localhost:5433/eidasremotesigning";
     private static final String PG_USER = "postgres";
@@ -121,12 +117,6 @@ public abstract class AbstractFullIntegrationTest {
     @Value("${spring.kafka.bootstrap-servers}")
     private String kafkaBootstrapServers;
 
-    @Value("${app.kafka.command-consumer-group}")
-    private String commandConsumerGroup;
-
-    @Value("${app.kafka.compensation-consumer-group}")
-    private String compensationConsumerGroup;
-
     protected ObjectMapper objectMapper;
     protected KafkaConsumer<String, String> sagaReplyKafkaConsumer;
 
@@ -146,13 +136,6 @@ public abstract class AbstractFullIntegrationTest {
                     EIDAS_BASE_URL, EIDAS_PG_JDBC_URL, PG_USER, PG_PASSWORD);
             registry.add("app.csc.client-id", () -> eidasSetup.clientId());
             registry.add("app.csc.credential-id", () -> eidasSetup.credentialId());
-
-            // Unique consumer groups per JVM so Camel starts from latest with no stale offsets
-            registry.add("app.kafka.command-consumer-group",
-                    () -> "pdf-signing-test-cmd-" + TEST_RUN_ID);
-            registry.add("app.kafka.compensation-consumer-group",
-                    () -> "pdf-signing-test-comp-" + TEST_RUN_ID);
-
             log.info("[AbstractFullIntegrationTest] eIDAS setup complete: clientId={}, credentialId={}",
                     eidasSetup.clientId(), eidasSetup.credentialId());
         } catch (Exception e) {
@@ -181,33 +164,6 @@ public abstract class AbstractFullIntegrationTest {
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         sagaReplyKafkaConsumer = new KafkaConsumer<>(props);
         sagaReplyKafkaConsumer.subscribe(List.of(SAGA_REPLY_TOPIC));
-    }
-
-    /**
-     * Waits for the Camel Kafka consumers to register with Kafka and get partition
-     * assignment. Without this, {@code autoOffsetReset=latest} can land the start
-     * offset AFTER the first test message if the consumer hasn't been assigned yet.
-     */
-    @BeforeAll
-    void waitForCamelConsumersReady() {
-        Properties adminProps = new Properties();
-        adminProps.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServers);
-        try (AdminClient admin = AdminClient.create(adminProps)) {
-            await().atMost(30, TimeUnit.SECONDS)
-                    .pollInterval(2, TimeUnit.SECONDS)
-                    .until(() -> {
-                        var desc = admin.describeConsumerGroups(
-                                List.of(commandConsumerGroup, compensationConsumerGroup))
-                                .all().get(3, TimeUnit.SECONDS);
-                        boolean cmdReady = desc.get(commandConsumerGroup) != null
-                                && !desc.get(commandConsumerGroup).members().isEmpty();
-                        boolean compReady = desc.get(compensationConsumerGroup) != null
-                                && !desc.get(compensationConsumerGroup).members().isEmpty();
-                        return cmdReady && compReady;
-                    });
-            log.info("[AbstractFullIntegrationTest] Camel consumers ready: cmd={}, comp={}",
-                    commandConsumerGroup, compensationConsumerGroup);
-        }
     }
 
     /**

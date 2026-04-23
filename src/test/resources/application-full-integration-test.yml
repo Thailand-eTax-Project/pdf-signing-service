@@ -54,7 +54,6 @@ spring.cloud:
 app:
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS:localhost:9093}
-    auto-offset-reset: latest
     topics:
       saga-command: saga.command.pdf-signing
       saga-compensation: saga.compensation.pdf-signing
