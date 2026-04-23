@@ -1,7 +1,6 @@
 package com.wpanther.pdfsigning.infrastructure.adapter.out.storage;
 
 import com.wpanther.pdfsigning.domain.model.DocumentType;
-import com.wpanther.pdfsigning.domain.model.SignedPdfDocument;
 import com.wpanther.pdfsigning.domain.model.StorageException;
 import com.wpanther.pdfsigning.application.port.out.DocumentStoragePort;
 import com.wpanther.pdfsigning.infrastructure.config.properties.StorageProperties;
@@ -106,10 +105,9 @@ public class S3StorageAdapter implements DocumentStoragePort {
     }
 
     @Override
-    public String store(byte[] documentData, DocumentType documentType, SignedPdfDocument document) {
+    public String store(byte[] documentData, DocumentType documentType, String documentId) {
         try {
             StorageProperties.S3 s3 = storageProperties.getS3();
-            String documentId = document != null ? document.getId().getValue().toString() : "unknown";
             String key = generateKey(documentType, documentId);
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()

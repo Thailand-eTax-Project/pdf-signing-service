@@ -79,7 +79,7 @@ class S3StorageAdapterTest {
             SignedPdfDocument document = createTestDocument();
 
             // When
-            String storageUrl = adapter.store(documentData, DocumentType.SIGNED_PDF, document);
+            String storageUrl = adapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString());
 
             // Then
             assertThat(storageUrl).isEqualTo(PRESIGNED_URL);
@@ -98,7 +98,7 @@ class S3StorageAdapterTest {
             ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
             // When
-            adapter.store(documentData, DocumentType.SIGNED_PDF, document);
+            adapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString());
 
             // Then — verify the key passed to S3 has the expected structure
             verify(mockS3Client).putObject(putCaptor.capture(), any(RequestBody.class));
@@ -122,7 +122,7 @@ class S3StorageAdapterTest {
                 ArgumentCaptor.forClass(GetObjectPresignRequest.class);
 
             // When
-            adapter.store(documentData, DocumentType.SIGNED_PDF, document);
+            adapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString());
 
             // Then — verify TTL is 60 minutes as configured
             verify(mockPresigner).presignGetObject(presignCaptor.capture());
@@ -131,18 +131,19 @@ class S3StorageAdapterTest {
         }
 
         @Test
-        @DisplayName("Should handle unknown document ID gracefully")
-        void shouldHandleUnknownDocumentId() {
+        @DisplayName("Should include document ID in S3 key")
+        void shouldIncludeDocumentIdInKey() {
             // Given
             byte[] documentData = "test pdf".getBytes();
+            String documentId = "doc-abc123";
             ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
             // When
-            adapter.store(documentData, DocumentType.SIGNED_PDF, null);
+            adapter.store(documentData, DocumentType.SIGNED_PDF, documentId);
 
-            // Then — key should contain "unknown"
+            // Then — key should contain the document ID
             verify(mockS3Client).putObject(putCaptor.capture(), any(RequestBody.class));
-            assertThat(putCaptor.getValue().key()).contains("unknown");
+            assertThat(putCaptor.getValue().key()).contains(documentId);
         }
 
         @Test
@@ -155,7 +156,7 @@ class S3StorageAdapterTest {
                 .when(mockS3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
 
             // When/Then
-            assertThatThrownBy(() -> adapter.store(documentData, DocumentType.SIGNED_PDF, document))
+            assertThatThrownBy(() -> adapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString()))
                 .isInstanceOf(com.wpanther.pdfsigning.domain.model.StorageException.class)
                 .hasMessageContaining("Failed to store document");
         }
@@ -298,7 +299,7 @@ class S3StorageAdapterTest {
             ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
             // When
-            adapter.store(documentData, DocumentType.TAX_INVOICE, document);
+            adapter.store(documentData, DocumentType.TAX_INVOICE, document.getId().asString());
 
             // Then — underscores should be replaced with hyphens in the key
             verify(mockS3Client).putObject(putCaptor.capture(), any(RequestBody.class));
@@ -315,7 +316,7 @@ class S3StorageAdapterTest {
             ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
             // When
-            adapter.store(documentData, DocumentType.INVOICE, document);
+            adapter.store(documentData, DocumentType.INVOICE, document.getId().asString());
 
             // Then
             verify(mockS3Client).putObject(putCaptor.capture(), any(RequestBody.class));

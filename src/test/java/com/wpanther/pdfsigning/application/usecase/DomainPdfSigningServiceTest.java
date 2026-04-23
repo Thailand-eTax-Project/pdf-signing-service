@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -102,7 +101,7 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, oneCert(), null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), isNull()))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
                 .thenReturn(storageUrl);
 
             // When
@@ -121,7 +120,7 @@ class DomainPdfSigningServiceTest {
             verify(mockDownloadPort).downloadPdf(originalPdfUrl);
             verify(mockPdfPort).computeByteRangeDigest(pdfBytes);
             verify(mockSigningPort).signPdfWithCertChain(pdfBytes, digest, padesLevel);
-            verify(mockStoragePort).store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), isNull());
+            verify(mockStoragePort).store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId));
         }
 
         @Test
@@ -215,7 +214,7 @@ class DomainPdfSigningServiceTest {
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, certChain, null, null));
 
             doThrow(new StorageException("S3 bucket unavailable"))
-                .when(mockStoragePort).store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), isNull());
+                .when(mockStoragePort).store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId));
 
             // When & Then
             assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, padesLevel))
@@ -245,7 +244,7 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, oneCert(), null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), isNull()))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
                 .thenReturn(storageUrl);
 
             // When
@@ -275,7 +274,7 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, oneCert(), null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), isNull()))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
                 .thenReturn(storageUrl);
 
             // When
@@ -304,7 +303,7 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, new X509Certificate[0], null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), isNull()))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
                 .thenReturn(storageUrl);
 
             // When/Then — empty chain must never silently produce a garbage certificate
@@ -334,7 +333,7 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, new X509Certificate[]{badCert}, null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), isNull()))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
                 .thenReturn(storageUrl);
 
             // When/Then

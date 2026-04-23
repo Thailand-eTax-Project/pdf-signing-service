@@ -124,7 +124,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             // 4c. Execute signing via hexagonal domain service
             DomainPdfSigningService.SignedPdfResult result = domainPdfSigningService.signPdf(
                 command.getPdfUrl(),
-                document.getId().toString(),
+                document.getId().asString(),
                 padesProperties.getLevel()  // Use configured PAdES level (default: BASELINE_B)
             );
 
@@ -145,7 +145,7 @@ public class SagaCommandHandler implements SagaCommandPort {
                 command.getSagaId(),
                 command.getSagaStep(),
                 command.getCorrelationId(),
-                document.getId().toString(),
+                document.getId().asString(),
                 result.signedPdfUrl(),
                 result.signedPdfSize(),
                 result.transactionId(),
@@ -158,7 +158,7 @@ public class SagaCommandHandler implements SagaCommandPort {
                 command.getDocumentId(),
                 command.getDocumentNumber(),
                 command.getDocumentType(),
-                document.getId().toString(),
+                document.getId().asString(),
                 result.signedPdfUrl(),
                 result.signedPdfSize(),
                 result.signatureLevel(),
@@ -354,7 +354,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             command.getSagaId(),
             command.getSagaStep(),
             command.getCorrelationId(),
-            document.getId().toString(),
+            document.getId().asString(),
             document.getSignedPdfUrl(),
             document.getSignedPdfSize(),
             document.getTransactionId(),
@@ -367,7 +367,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             command.getDocumentId(),
             command.getDocumentNumber(),
             command.getDocumentType(),
-            document.getId().toString(),
+            document.getId().asString(),
             document.getSignedPdfUrl(),
             document.getSignedPdfSize(),
             document.getSignatureLevel(),
