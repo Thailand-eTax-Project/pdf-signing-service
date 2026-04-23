@@ -218,13 +218,23 @@ public class S3StorageAdapter implements DocumentStoragePort {
             ? storageUrl.substring(0, storageUrl.indexOf("?"))
             : storageUrl;
 
+        // Path-style: http://localhost:9100/etax-signed-pdfs/signed-pdf/...
         int bucketIndex = pathPart.indexOf("/" + bucketName + "/");
-        if (bucketIndex < 0) {
-            throw new StorageException(
-                "Storage URL is not from the configured bucket '"
-                + bucketName + "': " + storageUrl);
+        if (bucketIndex >= 0) {
+            return pathPart.substring(bucketIndex + bucketName.length() + 2);
         }
 
-        return pathPart.substring(bucketIndex + bucketName.length() + 2);
+        // Virtual-hosted-style: http://etax-signed-pdfs.localhost:9100/signed-pdf/...
+        URI uri = URI.create(pathPart);
+        if (uri.getHost() != null && uri.getHost().startsWith(bucketName + ".")) {
+            String path = uri.getPath();
+            if (path != null && path.startsWith("/")) {
+                return path.substring(1);
+            }
+        }
+
+        throw new StorageException(
+            "Storage URL is not from the configured bucket '"
+            + bucketName + "': " + storageUrl);
     }
 }
