@@ -53,7 +53,7 @@ class LocalStorageAdapterTest {
             SignedPdfDocument document = createTestDocument();
 
             // When
-            String storageUrl = adapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString());
+            String storageUrl = adapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString(), "INV-2024-001");
 
             // Then
             assertThat(storageUrl).isNotNull();
@@ -76,7 +76,7 @@ class LocalStorageAdapterTest {
             SignedPdfDocument document = createTestDocument();
 
             // When
-            String storageUrl = adapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString());
+            String storageUrl = adapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString(), "INV-2024-001");
 
             // Then - should have YYYY/MM/DD structure
             String relativePath = storageUrl.substring("http://localhost:8080/documents".length());
@@ -95,10 +95,12 @@ class LocalStorageAdapterTest {
             String documentId = "doc-abc123";
 
             // When
-            String storageUrl = adapter.store(documentData, DocumentType.SIGNED_PDF, documentId);
+            String documentNumber = "DOC-ABC-123";
+            String storageUrl = adapter.store(documentData, DocumentType.SIGNED_PDF, documentId, documentNumber);
 
             // Then
             assertThat(storageUrl).contains(documentId);
+            assertThat(storageUrl).contains(documentNumber);
         }
 
         @Test
@@ -116,7 +118,7 @@ class LocalStorageAdapterTest {
             SignedPdfDocument document = createTestDocument();
 
             // When/Then - should wrap exception in StorageException
-            assertThatThrownBy(() -> failingAdapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString()))
+            assertThatThrownBy(() -> failingAdapter.store(documentData, DocumentType.SIGNED_PDF, document.getId().asString(), "INV-2024-001"))
                 .isInstanceOf(com.wpanther.pdfsigning.domain.model.StorageException.class)
                 .hasMessageContaining("Failed to store document to local filesystem");
         }
@@ -159,7 +161,7 @@ class LocalStorageAdapterTest {
             SignedPdfDocument document = createTestDocument();
 
             // When
-            String storageUrl = adapter.store(originalData, DocumentType.SIGNED_PDF, document.getId().asString());
+            String storageUrl = adapter.store(originalData, DocumentType.SIGNED_PDF, document.getId().asString(), "INV-2024-001");
 
             // When/Then
             byte[] retrieved = adapter.retrieve(storageUrl);

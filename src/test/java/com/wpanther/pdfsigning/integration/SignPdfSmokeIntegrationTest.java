@@ -57,7 +57,7 @@ public class SignPdfSmokeIntegrationTest extends AbstractFullIntegrationTest {
 
         // Act
         DomainPdfSigningService.SignedPdfResult result = domainPdfSigningService.signPdf(
-                pdfUrl, documentId, PadesLevel.BASELINE_B);
+                pdfUrl, documentId, "SMOKE-TEST", PadesLevel.BASELINE_B);
 
         // Assert: signed PDF stored in MinIO
         assertThat(result.signedPdfUrl()).as("signedPdfUrl should not be blank").isNotBlank();

@@ -105,10 +105,10 @@ public class S3StorageAdapter implements DocumentStoragePort {
     }
 
     @Override
-    public String store(byte[] documentData, DocumentType documentType, String documentId) {
+    public String store(byte[] documentData, DocumentType documentType, String documentId, String documentNumber) {
         try {
             StorageProperties.S3 s3 = storageProperties.getS3();
-            String key = generateKey(documentType, documentId);
+            String key = generateKey(documentType, documentId, documentNumber);
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(s3.getBucketName())
@@ -182,13 +182,14 @@ public class S3StorageAdapter implements DocumentStoragePort {
     }
 
     /**
-     * Generate S3 key: {documentType}/YYYY/MM/DD/{documentType}-{documentId}.pdf
+     * Generate S3 key: {documentType}/YYYY/MM/DD/{documentType}-{documentId}-{documentNumber}.pdf
      */
-    private String generateKey(DocumentType documentType, String documentId) {
+    private String generateKey(DocumentType documentType, String documentId, String documentNumber) {
         LocalDate now = LocalDate.now();
         String sanitizedType = documentType.getValue().toLowerCase().replace("_", "-");
-        return String.format("%s/%04d/%02d/%02d/%s-%s.pdf",
-            sanitizedType, now.getYear(), now.getMonthValue(), now.getDayOfMonth(), sanitizedType, documentId);
+        return String.format("%s/%04d/%02d/%02d/%s-%s-%s.pdf",
+            sanitizedType, now.getYear(), now.getMonthValue(), now.getDayOfMonth(),
+            sanitizedType, documentId, documentNumber);
     }
 
     /**

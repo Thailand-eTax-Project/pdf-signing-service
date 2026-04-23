@@ -92,6 +92,7 @@ class SagaCommandHandlerTest {
         when(domainPdfSigningService.signPdf(
             eq("http://example.com/file.pdf"),
             anyString(),
+            eq("INV-2024-001"),
             eq(PadesLevel.BASELINE_B)
         )).thenReturn(result);
 
@@ -103,6 +104,7 @@ class SagaCommandHandlerTest {
         verify(domainPdfSigningService).signPdf(
             eq("http://example.com/file.pdf"),
             anyString(),
+            eq("INV-2024-001"),
             eq(PadesLevel.BASELINE_B)
         );
         verify(sagaReplyPort).publishSuccess(
@@ -154,7 +156,7 @@ class SagaCommandHandlerTest {
         sagaCommandHandler.handleProcessCommand(command);
 
         // Then
-        verify(domainPdfSigningService, never()).signPdf(any(), any(), any());
+        verify(domainPdfSigningService, never()).signPdf(any(), any(), any(), any());
         verify(sagaReplyPort).publishSuccess(
             eq("saga-123"),
             eq(SagaStep.SIGN_PDF),
@@ -344,7 +346,7 @@ class SagaCommandHandlerTest {
             eq("Maximum retry attempts exceeded for PDF signing"),
             eq("corr-456")
         );
-        verify(domainPdfSigningService, never()).signPdf(any(), any(), any());
+        verify(domainPdfSigningService, never()).signPdf(any(), any(), any(), any());
     }
 
     @Test
@@ -365,7 +367,7 @@ class SagaCommandHandlerTest {
 
         when(documentRepository.findByDocumentId("doc-789")).thenReturn(Optional.empty());
         when(documentRepository.save(any(SignedPdfDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(domainPdfSigningService.signPdf(any(), any(), any()))
+        when(domainPdfSigningService.signPdf(any(), any(), any(), any()))
             .thenThrow(new RuntimeException("Signing failed"));
 
         // When

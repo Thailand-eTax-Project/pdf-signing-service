@@ -125,6 +125,7 @@ public class SagaCommandHandler implements SagaCommandPort {
             DomainPdfSigningService.SignedPdfResult result = domainPdfSigningService.signPdf(
                 command.getPdfUrl(),
                 document.getId().asString(),
+                command.getDocumentNumber(),
                 padesProperties.getLevel()  // Use configured PAdES level (default: BASELINE_B)
             );
 

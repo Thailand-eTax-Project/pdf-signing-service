@@ -90,6 +90,7 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_B;
 
             byte[] pdfBytes = "test pdf content".getBytes();
@@ -101,12 +102,12 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, oneCert(), null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId), eq(documentNumber)))
                 .thenReturn(storageUrl);
 
             // When
             DomainPdfSigningService.SignedPdfResult result = service.signPdf(
-                originalPdfUrl, documentId, padesLevel
+                originalPdfUrl, documentId, documentNumber, padesLevel
             );
 
             // Then
@@ -120,7 +121,7 @@ class DomainPdfSigningServiceTest {
             verify(mockDownloadPort).downloadPdf(originalPdfUrl);
             verify(mockPdfPort).computeByteRangeDigest(pdfBytes);
             verify(mockSigningPort).signPdfWithCertChain(pdfBytes, digest, padesLevel);
-            verify(mockStoragePort).store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId));
+            verify(mockStoragePort).store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId), eq(documentNumber));
         }
 
         @Test
@@ -129,13 +130,14 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_B;
 
             doThrow(new SigningException("Network error downloading PDF"))
                 .when(mockDownloadPort).downloadPdf(originalPdfUrl);
 
             // When & Then
-            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, padesLevel))
+            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, documentNumber, padesLevel))
                 .isInstanceOf(SigningException.class)
                 .hasMessageContaining("Network error downloading PDF");
 
@@ -150,6 +152,7 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_B;
 
             byte[] pdfBytes = "test pdf content".getBytes();
@@ -159,7 +162,7 @@ class DomainPdfSigningServiceTest {
                 .when(mockPdfPort).computeByteRangeDigest(pdfBytes);
 
             // When & Then
-            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, padesLevel))
+            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, documentNumber, padesLevel))
                 .isInstanceOf(SigningException.class)
                 .hasMessageContaining("Digest computation failed");
 
@@ -174,6 +177,7 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_T;
 
             byte[] pdfBytes = "test pdf content".getBytes();
@@ -186,7 +190,7 @@ class DomainPdfSigningServiceTest {
                 .when(mockSigningPort).signPdfWithCertChain(pdfBytes, digest, padesLevel);
 
             // When & Then
-            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, padesLevel))
+            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, documentNumber, padesLevel))
                 .isInstanceOf(SigningException.class)
                 .hasMessageContaining("CSC API error");
 
@@ -201,6 +205,7 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_B;
 
             byte[] pdfBytes = "test pdf content".getBytes();
@@ -214,10 +219,10 @@ class DomainPdfSigningServiceTest {
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, certChain, null, null));
 
             doThrow(new StorageException("S3 bucket unavailable"))
-                .when(mockStoragePort).store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId));
+                .when(mockStoragePort).store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId), eq(documentNumber));
 
             // When & Then
-            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, padesLevel))
+            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, documentNumber, padesLevel))
                 .isInstanceOf(StorageException.class)
                 .hasMessageContaining("S3 bucket unavailable");
 
@@ -233,6 +238,7 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_T;
 
             byte[] pdfBytes = "test pdf content".getBytes();
@@ -244,12 +250,12 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, oneCert(), null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId), eq(documentNumber)))
                 .thenReturn(storageUrl);
 
             // When
             DomainPdfSigningService.SignedPdfResult result = service.signPdf(
-                originalPdfUrl, documentId, padesLevel
+                originalPdfUrl, documentId, documentNumber, padesLevel
             );
 
             // Then
@@ -263,6 +269,7 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_B;
 
             byte[] pdfBytes = "test pdf content".getBytes();
@@ -274,12 +281,12 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, oneCert(), null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId), eq(documentNumber)))
                 .thenReturn(storageUrl);
 
             // When
             DomainPdfSigningService.SignedPdfResult result = service.signPdf(
-                originalPdfUrl, documentId, padesLevel
+                originalPdfUrl, documentId, documentNumber, padesLevel
             );
 
             // Then - should extract just the filename
@@ -292,6 +299,7 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_B;
 
             byte[] pdfBytes = "test pdf content".getBytes();
@@ -303,11 +311,11 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, new X509Certificate[0], null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId), eq(documentNumber)))
                 .thenReturn(storageUrl);
 
             // When/Then — empty chain must never silently produce a garbage certificate
-            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, padesLevel))
+            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, documentNumber, padesLevel))
                 .isInstanceOf(SigningException.class)
                 .hasMessageContaining("empty certificate chain");
         }
@@ -318,6 +326,7 @@ class DomainPdfSigningServiceTest {
             // Given
             String originalPdfUrl = "https://storage.example.com/original.pdf";
             String documentId = "doc-123";
+            String documentNumber = "INV-2024-001";
             PadesLevel padesLevel = PadesLevel.BASELINE_B;
 
             byte[] pdfBytes = "test pdf content".getBytes();
@@ -333,11 +342,11 @@ class DomainPdfSigningServiceTest {
             when(mockPdfPort.computeByteRangeDigest(pdfBytes)).thenReturn(digest);
             when(mockSigningPort.signPdfWithCertChain(pdfBytes, digest, padesLevel))
                 .thenReturn(new SigningPort.SigningResult(signedPdfBytes, new X509Certificate[]{badCert}, null, null));
-            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId)))
+            when(mockStoragePort.store(eq(signedPdfBytes), eq(DocumentType.SIGNED_PDF), eq(documentId), eq(documentNumber)))
                 .thenReturn(storageUrl);
 
             // When/Then
-            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, padesLevel))
+            assertThatThrownBy(() -> service.signPdf(originalPdfUrl, documentId, documentNumber, padesLevel))
                 .isInstanceOf(SigningException.class)
                 .hasMessageContaining("Failed to encode certificate chain");
         }

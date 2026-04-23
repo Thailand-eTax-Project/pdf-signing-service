@@ -15,13 +15,14 @@ public interface DocumentStoragePort {
     /**
      * Store document data and return storage URL.
      *
-     * @param documentData The document bytes to store
-     * @param documentType Type of document (e.g., UNSIGNED_PDF, SIGNED_PDF)
-     * @param documentId   Unique identifier used to name the stored file
+     * @param documentData   The document bytes to store
+     * @param documentType   Type of document (e.g., UNSIGNED_PDF, SIGNED_PDF)
+     * @param documentId     Unique identifier used to name the stored file
+     * @param documentNumber Human-readable document number included in the filename
      * @return Storage URL that can be used to retrieve the document
      * @throws StorageException if storage fails
      */
-    String store(byte[] documentData, DocumentType documentType, String documentId) throws StorageException;
+    String store(byte[] documentData, DocumentType documentType, String documentId, String documentNumber) throws StorageException;
 
     /**
      * Retrieve document data from storage.

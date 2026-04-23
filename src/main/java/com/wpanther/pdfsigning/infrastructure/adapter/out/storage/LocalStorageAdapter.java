@@ -30,7 +30,7 @@ public class LocalStorageAdapter implements DocumentStoragePort {
     private final StorageProperties storageProperties;
 
     @Override
-    public String store(byte[] documentData, DocumentType documentType, String documentId) {
+    public String store(byte[] documentData, DocumentType documentType, String documentId, String documentNumber) {
         try {
             String basePath = storageProperties.getLocal().getBasePath();
             String baseUrl = storageProperties.getLocal().getBaseUrl();
@@ -43,7 +43,8 @@ public class LocalStorageAdapter implements DocumentStoragePort {
             Path directory = Paths.get(basePath, year, month, day);
             Files.createDirectories(directory);
 
-            String filename = String.format("%s-%s.pdf", documentType.getValue().toLowerCase(), documentId);
+            String filename = String.format("%s-%s-%s.pdf",
+                documentType.getValue().toLowerCase(), documentId, documentNumber);
             Path filePath = directory.resolve(filename);
 
             Files.write(filePath, documentData);
