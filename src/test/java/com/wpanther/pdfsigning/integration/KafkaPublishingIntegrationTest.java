@@ -169,7 +169,7 @@ class KafkaPublishingIntegrationTest extends AbstractFullIntegrationTest {
 
             // Wait for DB completion and outbox
             awaitDocumentStatus(documentId, "COMPLETED");
-            String signedDocumentId = (String) getDocumentByDocumentId(documentId).get("id");
+            String signedDocumentId = getDocumentByDocumentId(documentId).get("id").toString();
             awaitOutboxEventCount(signedDocumentId, 1);
 
             // Poll Kafka for the notification event
@@ -204,7 +204,7 @@ class KafkaPublishingIntegrationTest extends AbstractFullIntegrationTest {
 
             awaitDocumentStatus(documentId, "COMPLETED");
 
-            String signedDocumentId = (String) getDocumentByDocumentId(documentId).get("id");
+            String signedDocumentId = getDocumentByDocumentId(documentId).get("id").toString();
 
             // Both outbox rows must exist in DB
             awaitOutboxEventCount(sagaId, 1);
