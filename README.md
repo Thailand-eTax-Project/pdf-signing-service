@@ -119,6 +119,7 @@ PENDING → SIGNING → COMPLETED
 |-------|-------|---------|
 | `saga.reply.pdf-signing` | `PdfSigningReplyEvent` | Reply to orchestrator (SUCCESS/FAILURE/COMPENSATED) |
 | `notification.events` | `PdfSignedNotificationEvent` / `PdfSigningFailedNotificationEvent` | Notification to notification-service (observer) |
+| `document.archive` | `DocumentArchiveEvent` | Fire-and-forget archival (SIGNED_PDF stored by document-storage-service) |
 | `pdf.signing.dlq` | Failed events | Dead Letter Queue |
 
 ### Event Schemas
