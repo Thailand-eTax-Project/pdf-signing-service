@@ -147,7 +147,7 @@ PENDING → SIGNING → COMPLETED
   "correlationId": "correlation-uuid",
   "status": "SUCCESS",
   "signedDocumentId": "document-uuid",
-  "signedPdfUrl": "http://localhost:8087/signed/...",
+  "signedPdfUrl": "http://localhost:8089/signed/...",
   "signedPdfSize": 48234,
   "transactionId": "TXN-uuid",
   "certificate": "-----BEGIN CERTIFICATE-----...",
@@ -163,7 +163,7 @@ PENDING → SIGNING → COMPLETED
   "invoiceNumber": "INV-2024-001",
   "documentType": "INVOICE",
   "signedDocumentId": "document-uuid",
-  "signedPdfUrl": "http://localhost:8087/signed/...",
+  "signedPdfUrl": "http://localhost:8089/signed/...",
   "signedPdfSize": 48234,
   "signatureLevel": "PAdES-BASELINE-B",
   "signatureTimestamp": "2025-01-29T10:31:00Z",
@@ -223,7 +223,7 @@ PENDING → SIGNING → COMPLETED
 | `PADES_LEVEL` | PAdES conformance level | `BASELINE_B` |
 | `STORAGE_PROVIDER` | Storage backend (`local` or `s3`) | `local` |
 | `SIGNED_PDF_STORAGE_PATH` | Local storage path for signed PDFs | `/var/signed-documents` |
-| `SIGNED_PDF_STORAGE_BASE_URL` | Base URL for signed PDF access (local) | `http://localhost:8087` |
+| `SIGNED_PDF_STORAGE_BASE_URL` | Base URL for signed PDF access (local) | `http://localhost:8089` |
 | `S3_BUCKET_NAME` | S3/MinIO bucket name | `etax-signed-pdfs` |
 | `AWS_REGION` | AWS region | `us-east-1` |
 | `AWS_ACCESS_KEY` | S3/MinIO access key | `minioadmin` |
@@ -274,7 +274,7 @@ app:
     provider: local                     # "local" or "s3"
     local:
       base-path: /var/signed-documents  # Required for local provider
-      base-url: http://localhost:8087    # Required: HTTP/HTTPS URL
+      base-url: http://localhost:8089    # Required: HTTP/HTTPS URL
     s3:
       bucket-name: etax-signed-pdfs      # Required for S3 provider
       region: us-east-1                  # Required for S3 provider
@@ -308,10 +308,10 @@ Stores signed PDFs on the local filesystem with date-based directory structure:
 ```bash
 export STORAGE_PROVIDER=local
 export SIGNED_PDF_STORAGE_PATH=/var/signed-documents
-export SIGNED_PDF_STORAGE_BASE_URL=http://localhost:8087
+export SIGNED_PDF_STORAGE_BASE_URL=http://localhost:8089
 ```
 
-**Public URL format:** `http://localhost:8087/signed-documents/YYYY/MM/DD/signed-pdf-{documentId}.pdf`
+**Public URL format:** `http://localhost:8089/signed-documents/YYYY/MM/DD/signed-pdf-{documentId}.pdf`
 
 ### S3/MinIO Storage
 
@@ -365,7 +365,7 @@ export KAFKA_BROKERS=localhost:9092
 export CSC_SERVICE_URL=http://localhost:9000
 export STORAGE_PROVIDER=local
 export SIGNED_PDF_STORAGE_PATH=/var/signed-documents
-export SIGNED_PDF_STORAGE_BASE_URL=http://localhost:8087
+export SIGNED_PDF_STORAGE_BASE_URL=http://localhost:8089
 
 mkdir -p /var/signed-documents
 
