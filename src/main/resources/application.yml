@@ -46,6 +46,8 @@ spring:
             url: ${CSC_SERVICE_URL:http://localhost:9000}
           csc-api-client:
             url: ${CSC_SERVICE_URL:http://localhost:9000}
+          csc-credentials-info-client:
+            url: ${CSC_SERVICE_URL:http://localhost:9000}
 
 # Apache Camel configuration
 camel:
@@ -84,14 +86,15 @@ app:
       saga-reply: saga.reply.pdf-signing
       notification-events: pdf.signed
       dlq: pdf.signing.dlq
+      document-archive: document.archive
 
   csc:
     service-url: ${CSC_SERVICE_URL:http://localhost:9000}
     auth-endpoint: /csc/v2/credentials/authorize
     sign-hash-endpoint: /csc/v2/signatures/signHash
+    credentials-info-endpoint: /csc/v2/credentials/info
     credential-id: ${CSC_CREDENTIAL_ID:default-credential}
-    client-id: ${CSC_CLIENT_ID:pdf-signing-service}
-    hash-algo: SHA-256
+    hash-algorithm-oid: 2.16.840.1.101.3.4.2.1
     pin: ${CSC_PIN:}
     timeout-seconds: 30
     sad:
