@@ -129,7 +129,7 @@ public class DomainPdfSigningService {
 
         // Step 5: Build result
         // transactionId from CSC signHash response enables audit traceability to CSC service logs.
-        // Falls back to local UUID if CSC does not provide an operationID (operationID is optional
+        // Falls back to local UUID if CSC does not provide a responseID (responseID is optional
         // in CSC API v2.0 signHash response — not all CSC providers return it).
         String transactionId = signingResult.transactionId() != null
             ? signingResult.transactionId()

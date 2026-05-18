@@ -10,7 +10,6 @@ import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCAuthorizeRe
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCAuthorizeResponse;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCSignatureRequest;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCSignatureResponse;
-import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.CertificateParser;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.CertificateValidator;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.PadesCmsBuilder;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.PadesEmbedder;
@@ -33,7 +32,6 @@ public class CscSigningAdapter implements SigningPort {
     private final CSCApiClient apiClient;
     private final PadesCmsBuilder cmsBuilder;
     private final PadesEmbedder pdfEmbedder;
-    private final CertificateParser certificateParser;
     private final CertificateValidator certificateValidator;
     private final SadTokenValidator sadTokenValidator;
     private final CscProperties cscProperties;

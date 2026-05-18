@@ -1,9 +1,11 @@
 package com.wpanther.pdfsigning.infrastructure.adapter.out.csc;
 
+import com.wpanther.pdfsigning.domain.model.SigningException;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.client.CSCCredentialsInfoClient;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCCredentialsInfoRequest;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCCredentialsInfoResponse;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.CertificateParser;
+import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.CertificateValidator;
 import com.wpanther.pdfsigning.infrastructure.config.properties.CscProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,12 +31,13 @@ class CredentialInfoCacheTest {
     @Mock private CSCCredentialsInfoClient mockClient;
     @Mock private CertificateParser mockParser;
     @Mock private CscProperties mockProperties;
+    @Mock private CertificateValidator mockCertificateValidator;
 
     private CredentialInfoCache cache;
 
     @BeforeEach
     void setUp() {
-        cache = new CredentialInfoCache(mockClient, mockParser, mockProperties);
+        cache = new CredentialInfoCache(mockClient, mockParser, mockProperties, mockCertificateValidator);
         when(mockProperties.getCredentialId()).thenReturn("test-cred");
     }
 
@@ -49,6 +52,7 @@ class CredentialInfoCacheTest {
             CSCCredentialsInfoResponse response = buildResponse("certBase64");
             when(mockClient.getCredentialInfo(any())).thenReturn(response);
             when(mockParser.parseDerCertificates(new String[]{"certBase64"})).thenReturn(expectedChain);
+            doNothing().when(mockCertificateValidator).validateChain(any());
 
             cache.refresh();
 
@@ -65,6 +69,7 @@ class CredentialInfoCacheTest {
             X509Certificate[] chain = new X509Certificate[1];
             when(mockClient.getCredentialInfo(any())).thenReturn(buildResponse("cert"));
             when(mockParser.parseDerCertificates(any())).thenReturn(chain);
+            doNothing().when(mockCertificateValidator).validateChain(any());
 
             cache.refresh();
             cache.getCertChain();
@@ -82,6 +87,7 @@ class CredentialInfoCacheTest {
             when(mockParser.parseDerCertificates(any()))
                 .thenReturn(first)
                 .thenReturn(second);
+            doNothing().when(mockCertificateValidator).validateChain(any());
 
             cache.refresh();
             assertThat(cache.getCertChain()).isSameAs(first);
@@ -99,6 +105,20 @@ class CredentialInfoCacheTest {
             assertThatThrownBy(() -> cache.refresh())
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("CSC unavailable");
+        }
+        @Test
+        @DisplayName("Should propagate SigningException when certificate validation fails")
+        void shouldPropagateValidationException() throws IOException {
+            X509Certificate[] chain = new X509Certificate[1];
+            when(mockClient.getCredentialInfo(any())).thenReturn(buildResponse("cert"));
+            when(mockParser.parseDerCertificates(any())).thenReturn(chain);
+            doThrow(new SigningException("bad cert"))
+                .when(mockCertificateValidator).validateChain(any());
+
+            assertThatThrownBy(() -> cache.refresh())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Certificate validation failed for cached signing certificate")
+                .hasCauseInstanceOf(SigningException.class);
         }
     }
 

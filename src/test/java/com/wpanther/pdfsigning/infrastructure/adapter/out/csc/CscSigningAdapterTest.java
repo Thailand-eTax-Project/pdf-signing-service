@@ -10,7 +10,6 @@ import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCAuthorizeRe
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCAuthorizeResponse;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCSignatureRequest;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto.CSCSignatureResponse;
-import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.CertificateParser;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.CertificateValidator;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.PadesCmsBuilder;
 import com.wpanther.pdfsigning.infrastructure.adapter.out.pdf.PadesEmbedder;
@@ -41,7 +40,6 @@ class CscSigningAdapterTest {
     @Mock private CSCApiClient mockApiClient;
     @Mock private PadesCmsBuilder mockCmsBuilder;
     @Mock private PadesEmbedder mockPdfEmbedder;
-    @Mock private CertificateParser mockCertificateParser;
     @Mock private CertificateValidator mockCertificateValidator;
     @Mock private SadTokenValidator mockSadTokenValidator;
     @Mock private CscProperties mockCscProperties;
@@ -56,7 +54,6 @@ class CscSigningAdapterTest {
             mockApiClient,
             mockCmsBuilder,
             mockPdfEmbedder,
-            mockCertificateParser,
             mockCertificateValidator,
             mockSadTokenValidator,
             mockCscProperties,
@@ -100,8 +97,6 @@ class CscSigningAdapterTest {
             assertThat(result.signedPdf()).isEqualTo(signedPdf);
             assertThat(result.transactionId()).isEqualTo("resp-001");
             verify(mockCredentialInfoCache).getCertChain();
-            // cert no longer comes from signHash response — parseCertificateChain must NOT be called
-            verify(mockCertificateParser, never()).parseCertificateChain(any());
         }
 
         @Test

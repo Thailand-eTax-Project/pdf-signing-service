@@ -47,7 +47,7 @@ public interface SigningPort {
      *
      * @param signedPdf      Signed PDF bytes
      * @param certificateChain X509 certificate chain from CSC service
-     * @param transactionId  CSC service operation ID (operationID from signHash response),
+     * @param transactionId  CSC service response ID (responseID from signHash response),
      *                       or null if the CSC service does not return one. Used for
      *                       audit traceability to correlate with CSC service logs.
      * @param timestamp      Instant of signing from CSC service TSA response
