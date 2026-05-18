@@ -6,39 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * CSC API authorize response DTO.
- *
- * Contains the SAD (Signature Activation Data) token used for signing.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CSCAuthorizeResponse {
 
-    /**
-     * Transaction ID for the authorization operation.
-     */
-    @JsonProperty("transactionID")
-    private String transactionID;
-
-    /**
-     * Signature Activation Data token.
-     * eidasremotesigning returns "sad" (lowercase) per CSC API v2.0.
-     */
     @JsonProperty("sad")
     private String SAD;
 
-    /**
-     * Expiration time of the SAD token (optional)
-     */
     @JsonProperty("expiresIn")
     private Long expiresIn;
-
-    /**
-     * Authorization mode (e.g., "implicit").
-     */
-    @JsonProperty("authMode")
-    private String authMode;
 }

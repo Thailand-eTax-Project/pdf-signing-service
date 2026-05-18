@@ -1,17 +1,14 @@
 package com.wpanther.pdfsigning.infrastructure.adapter.out.csc.dto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Unit tests for CSC DTOs.
- * These tests verify JSON serialization/deserialization for CSC API communication.
- */
 @DisplayName("CSC DTO Tests")
 class CSCDtoTest {
 
@@ -22,60 +19,70 @@ class CSCDtoTest {
     class CSCAuthorizeRequestTests {
 
         @Test
-        @DisplayName("Should serialize to JSON with correct field names")
+        @DisplayName("Should serialize hashAlgorithmOID and hashes (not hashAlgo/hash)")
         void shouldSerializeToJson() throws Exception {
-            // Given
             CSCAuthorizeRequest request = CSCAuthorizeRequest.builder()
-                .clientId("test-client")
                 .credentialID("credential-123")
-                .numSignatures("1")
-                .hashAlgo("SHA256")
-                .hash(new String[]{"dGhpc2lzYXhash"})
+                .numSignatures(1)
+                .hashAlgorithmOID("2.16.840.1.101.3.4.2.1")
+                .hashes(new String[]{"dGhpc2lzYXhash"})
                 .description("Test authorization")
                 .build();
 
-            // When
             String json = objectMapper.writeValueAsString(request);
 
-            // Then
-            assertThat(json).contains("\"clientId\":\"test-client\"");
             assertThat(json).contains("\"credentialID\":\"credential-123\"");
-            assertThat(json).contains("\"numSignatures\":\"1\"");
-            assertThat(json).contains("\"hashAlgo\":\"SHA256\"");
+            assertThat(json).contains("\"hashAlgorithmOID\":\"2.16.840.1.101.3.4.2.1\"");
+            assertThat(json).contains("\"hashes\"");
+            assertThat(json).doesNotContain("\"clientId\"");
+            assertThat(json).doesNotContain("\"hashAlgo\"");
+            assertThat(json).doesNotContain("\"hash\":");
         }
 
         @Test
-        @DisplayName("Should deserialize from JSON")
-        void shouldDeserializeFromJson() throws Exception {
-            // Given
-            String json = "{\"clientId\":\"client\",\"credentialID\":\"cred\",\"numSignatures\":\"2\",\"hashAlgo\":\"SHA384\"}";
+        @DisplayName("numSignatures should serialize as JSON integer not string")
+        void shouldSerializeNumSignaturesAsInteger() throws Exception {
+            CSCAuthorizeRequest request = CSCAuthorizeRequest.builder()
+                .credentialID("cred")
+                .numSignatures(1)
+                .build();
 
-            // When
-            CSCAuthorizeRequest request = objectMapper.readValue(json, CSCAuthorizeRequest.class);
+            String json = objectMapper.writeValueAsString(request);
 
-            // Then
-            assertThat(request.getClientId()).isEqualTo("client");
-            assertThat(request.getCredentialID()).isEqualTo("cred");
-            assertThat(request.getNumSignatures()).isEqualTo("2");
-            assertThat(request.getHashAlgo()).isEqualTo("SHA384");
+            assertThat(json).contains("\"numSignatures\":1");
+            assertThat(json).doesNotContain("\"numSignatures\":\"1\"");
+        }
+
+        @Test
+        @DisplayName("authData should serialize as array of id/value objects")
+        void shouldSerializeAuthData() throws Exception {
+            CSCAuthorizeRequest request = CSCAuthorizeRequest.builder()
+                .credentialID("cred")
+                .authData(List.of(
+                    CSCAuthorizeRequest.AuthDataEntry.builder().id("PIN").value("1234").build()
+                ))
+                .build();
+
+            String json = objectMapper.writeValueAsString(request);
+
+            assertThat(json).contains("\"authData\"");
+            assertThat(json).contains("\"id\":\"PIN\"");
+            assertThat(json).contains("\"value\":\"1234\"");
         }
 
         @Test
         @DisplayName("Should exclude null fields from JSON")
         void shouldExcludeNullFields() throws Exception {
-            // Given
             CSCAuthorizeRequest request = CSCAuthorizeRequest.builder()
-                .clientId("client")
                 .credentialID("cred")
                 .build();
 
-            // When
             String json = objectMapper.writeValueAsString(request);
 
-            // Then
             assertThat(json).doesNotContain("numSignatures");
-            assertThat(json).doesNotContain("hashAlgo");
-            assertThat(json).doesNotContain("hash");
+            assertThat(json).doesNotContain("hashAlgorithmOID");
+            assertThat(json).doesNotContain("hashes");
+            assertThat(json).doesNotContain("authData");
         }
     }
 
@@ -86,32 +93,27 @@ class CSCDtoTest {
         @Test
         @DisplayName("Should serialize and deserialize SAD token")
         void shouldSerializeSADToken() throws Exception {
-            // Given
             CSCAuthorizeResponse response = new CSCAuthorizeResponse();
             response.setSAD("test-sad-token");
             response.setExpiresIn(300L);
 
-            // When
             String json = objectMapper.writeValueAsString(response);
             CSCAuthorizeResponse deserialized = objectMapper.readValue(json, CSCAuthorizeResponse.class);
 
-            // Then
             assertThat(deserialized.getSAD()).isEqualTo("test-sad-token");
             assertThat(deserialized.getExpiresIn()).isEqualTo(300L);
         }
 
         @Test
-        @DisplayName("Should handle null expiresIn")
-        void shouldHandleNullExpiresIn() throws Exception {
-            // Given
+        @DisplayName("Should not contain transactionID or authMode fields")
+        void shouldNotContainRemovedFields() throws Exception {
             CSCAuthorizeResponse response = new CSCAuthorizeResponse();
             response.setSAD("token");
 
-            // When
             String json = objectMapper.writeValueAsString(response);
 
-            // Then
-            assertThat(json).doesNotContain("expiresIn");
+            assertThat(json).doesNotContain("transactionID");
+            assertThat(json).doesNotContain("authMode");
         }
     }
 
@@ -120,43 +122,36 @@ class CSCDtoTest {
     class CSCSignatureRequestTests {
 
         @Test
-        @DisplayName("Should serialize nested SignatureData")
-        void shouldSerializeNestedSignatureData() throws Exception {
-            // Given
-            CSCSignatureRequest.SignatureData signatureData = CSCSignatureRequest.SignatureData.builder()
-                .hashToSign(new String[]{"base64urlHash"})
-                .build();
-
+        @DisplayName("Should serialize flat hashes array and hashAlgorithmOID at top level")
+        void shouldSerializeFlatHashesAtTopLevel() throws Exception {
             CSCSignatureRequest request = CSCSignatureRequest.builder()
-                .clientId("client")
                 .credentialID("cred")
                 .SAD("sad-token")
-                .hashAlgo("SHA256")
-                .signatureData(signatureData)
+                .hashAlgorithmOID("2.16.840.1.101.3.4.2.1")
+                .hashes(new String[]{"base64hash"})
                 .build();
 
-            // When
             String json = objectMapper.writeValueAsString(request);
 
-            // Then
-            assertThat(json).contains("\"signatureData\"");
-            assertThat(json).contains("\"hashToSign\"");
-            assertThat(json).contains("base64urlHash");
+            assertThat(json).contains("\"hashes\"");
+            assertThat(json).contains("\"hashAlgorithmOID\":\"2.16.840.1.101.3.4.2.1\"");
+            assertThat(json).contains("base64hash");
+            assertThat(json).doesNotContain("\"clientId\"");
+            assertThat(json).doesNotContain("\"signatureData\"");
+            assertThat(json).doesNotContain("\"credentials\"");
+            assertThat(json).doesNotContain("\"hashAlgo\"");
         }
 
         @Test
-        @DisplayName("Should deserialize with nested SignatureData")
-        void shouldDeserializeWithNestedSignatureData() throws Exception {
-            // Given
-            String json = "{\"clientId\":\"c\",\"credentialID\":\"cr\",\"SAD\":\"st\",\"hashAlgo\":\"SHA512\",\"signatureData\":{\"hashToSign\":[\"hash1\"]}}";
+        @DisplayName("Should deserialize with hashes and hashAlgorithmOID")
+        void shouldDeserializeCorrectly() throws Exception {
+            String json = "{\"credentialID\":\"cr\",\"SAD\":\"st\",\"hashAlgorithmOID\":\"2.16.840.1.101.3.4.2.1\",\"hashes\":[\"hash1\"]}";
 
-            // When
             CSCSignatureRequest request = objectMapper.readValue(json, CSCSignatureRequest.class);
 
-            // Then
-            assertThat(request.getClientId()).isEqualTo("c");
-            assertThat(request.getSignatureData()).isNotNull();
-            assertThat(request.getSignatureData().getHashToSign()).containsExactly("hash1");
+            assertThat(request.getCredentialID()).isEqualTo("cr");
+            assertThat(request.getHashes()).containsExactly("hash1");
+            assertThat(request.getHashAlgorithmOID()).isEqualTo("2.16.840.1.101.3.4.2.1");
         }
     }
 
@@ -167,36 +162,42 @@ class CSCDtoTest {
         @Test
         @DisplayName("Should serialize and deserialize signature array")
         void shouldSerializeSignatureArray() throws Exception {
-            // Given
             CSCSignatureResponse response = CSCSignatureResponse.builder()
                 .signatureAlgorithm("1.2.840.113549.1.1.11")
                 .signatures(new String[]{"c2lnbmF0dXJlZmxvYg==", "c2lnMj"})
-                .certificate("-----BEGIN CERTIFICATE-----\nMIIC\n-----END CERTIFICATE-----")
                 .build();
 
-            // When
             String json = objectMapper.writeValueAsString(response);
             CSCSignatureResponse deserialized = objectMapper.readValue(json, CSCSignatureResponse.class);
 
-            // Then
             assertThat(deserialized.getSignatures()).hasSize(2);
-            assertThat(deserialized.getCertificate()).startsWith("-----BEGIN CERTIFICATE-----");
         }
 
         @Test
-        @DisplayName("Should handle optional operationID")
-        void shouldHandleOptionalOperationID() throws Exception {
-            // Given
+        @DisplayName("Should use responseID not operationID")
+        void shouldUseResponseId() throws Exception {
             CSCSignatureResponse response = CSCSignatureResponse.builder()
                 .signatures(new String[]{"sig"})
-                .operationID("async-op-123")
+                .responseID("async-resp-123")
                 .build();
 
-            // When
             String json = objectMapper.writeValueAsString(response);
 
-            // Then
-            assertThat(json).contains("\"operationID\":\"async-op-123\"");
+            assertThat(json).contains("\"responseID\":\"async-resp-123\"");
+            assertThat(json).doesNotContain("operationID");
+        }
+
+        @Test
+        @DisplayName("Should not contain certificate or timestampData fields")
+        void shouldNotContainRemovedFields() throws Exception {
+            CSCSignatureResponse response = CSCSignatureResponse.builder()
+                .signatures(new String[]{"sig"})
+                .build();
+
+            String json = objectMapper.writeValueAsString(response);
+
+            assertThat(json).doesNotContain("certificate");
+            assertThat(json).doesNotContain("timestampData");
         }
     }
 }
