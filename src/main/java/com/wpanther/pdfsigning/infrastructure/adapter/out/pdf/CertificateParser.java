@@ -111,4 +111,27 @@ public class CertificateParser {
     public X509Certificate getIssuerCertificate(X509Certificate[] chain) {
         return chain.length > 1 ? chain[chain.length - 1] : null;
     }
+
+    /**
+     * Parses an array of Base64-encoded DER certificates as returned by CSC credentials/info.
+     */
+    public X509Certificate[] parseDerCertificates(String[] base64DerCerts) throws IOException {
+        if (base64DerCerts == null || base64DerCerts.length == 0) {
+            throw new IOException("Certificate array is null or empty");
+        }
+        try {
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            X509Certificate[] chain = new X509Certificate[base64DerCerts.length];
+            for (int i = 0; i < base64DerCerts.length; i++) {
+                byte[] derBytes = Base64.getDecoder().decode(base64DerCerts[i]);
+                try (ByteArrayInputStream bais = new ByteArrayInputStream(derBytes)) {
+                    chain[i] = (X509Certificate) factory.generateCertificate(bais);
+                }
+            }
+            log.info("Parsed {} DER certificate(s) from credentials/info", chain.length);
+            return chain;
+        } catch (CertificateException e) {
+            throw new IOException("Failed to parse DER certificate array", e);
+        }
+    }
 }
